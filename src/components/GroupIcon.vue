@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue';
-
-
+import { Icon } from '@iconify/vue'
 </script>
 
 <template>
   <span style="display: inline-block;">
-    <Icon icon="logos:vue"></Icon>
+    <Icon icon="logos:vue" />
     <span>Vue</span>
   </span>
 </template>

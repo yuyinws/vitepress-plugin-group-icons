@@ -1,4 +1,4 @@
-import { App,Plugin } from 'vue'
+import type { App, Plugin } from 'vue'
 import GroupIcon from './components/GroupIcon.vue'
 
 export const plugin: Plugin = {

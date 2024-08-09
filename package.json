@@ -1,7 +1,13 @@
 {
   "name": "vitepress-plugin-group-icons",
-  "version": "0.0.0",
   "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
@@ -10,19 +16,15 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
   "dependencies": {
     "@iconify/vue": "^4.1.2"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^2.25.0",
     "@iconify-json/logos": "^1.1.44",
     "@types/node": "^22.1.0",
     "@vitejs/plugin-vue": "^5.1.2",
+    "eslint": "^9.8.0",
     "typescript": "^5.5.3",
     "vite": "^5.4.0",
     "vite-plugin-dts": "^4.0.1",
