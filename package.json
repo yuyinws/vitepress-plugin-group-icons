@@ -1,16 +1,30 @@
 {
   "name": "vitepress-plugin-group-icons",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.3",
+  "author": "Leo <https://github.com/yuyinws>",
+  "license": "MIT",
+  "homepage": "https://github.com/yuyinws/vitepress-plugin-group-icons#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuyinws/vitepress-plugin-group-icons.git"
+  },
+  "bugs": "https://github.com/yuyinws/vitepress-plugin-group-icons/issues",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     }
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
+    "lint": "eslint .",
+    "prepublishOnly": "nr build",
+    "release": "bumpp && npm publish",
+    "typecheck": "tsc --noEmit",
+    "prepare": "simple-git-hooks",
     "preview": "vite preview",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
@@ -24,12 +38,21 @@
     "@iconify-json/logos": "^1.1.44",
     "@types/node": "^22.1.0",
     "@vitejs/plugin-vue": "^5.1.2",
+    "bumpp": "^9.4.2",
     "eslint": "^9.8.0",
+    "lint-staged": "^15.2.8",
+    "simple-git-hooks": "^2.11.1",
     "typescript": "^5.5.3",
     "vite": "^5.4.0",
     "vite-plugin-dts": "^4.0.1",
     "vitepress": "^1.3.2",
     "vue": "^3.4.35",
     "vue-tsc": "^2.0.29"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
   }
 }
