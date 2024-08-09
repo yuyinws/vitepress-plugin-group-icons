@@ -1,0 +1,23 @@
+{
+  "name": "vitepress-plugin-group-icons",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@iconify/vue": "^4.1.2"
+  },
+  "devDependencies": {
+    "@iconify-json/logos": "^1.1.44",
+    "@types/node": "^22.1.0",
+    "@vitejs/plugin-vue": "^5.1.2",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.0",
+    "vite-plugin-dts": "^4.0.1",
+    "vue": "^3.4.35",
+    "vue-tsc": "^2.0.29"
+  }
+}
