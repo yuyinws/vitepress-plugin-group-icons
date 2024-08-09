@@ -1,28 +1,37 @@
-# tst
-
-<GroupIcon name="npm" />
+## title
 
 ::: code-group
 
-```js [<GroupIcon name="npm" />]
-/**
- * @type {import('vitepress').UserConfig}
- */
-const config = {
-  // ...
-}
-
-export default config
+```sh [npm]
+npm install vitepress-plugin-group-icons
 ```
 
-```ts [config.ts]
-import type { UserConfig } from 'vitepress'
+```sh [yarn]
+npm install vitepress-plugin-group-icons
+```
 
-const config: UserConfig = {
-  // ...
-}
+```sh [pnpm]
+npm install vitepress-plugin-group-icons
+```
 
-export default config
+```sh [bun]
+npm install vitepress-plugin-group-icons
+```
+
+```sh [bunx]
+npm install vitepress-plugin-group-icons
+```
+
+:::
+
+::: code-group
+
+```sh [Next.js]
+npm install vitepress-plugin-group-icons
+```
+
+```sh [Nuxt]
+npm install vitepress-plugin-group-icons
 ```
 
 :::
