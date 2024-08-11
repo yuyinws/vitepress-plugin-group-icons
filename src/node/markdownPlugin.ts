@@ -1,4 +1,3 @@
-/* eslint-disable ts/explicit-function-return-type */
 import type MarkdownIt from 'markdown-it'
 import type { StateCore } from 'markdown-it/index.js'
 
