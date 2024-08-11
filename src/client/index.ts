@@ -1,4 +1,6 @@
 import type { App, Plugin } from 'vue'
+// eslint-disable-next-line ts/ban-ts-comment, ts/prefer-ts-expect-error
+// @ts-ignore
 import GroupIcon from './GroupIcon.vue'
 
 export const GroupIconComponent: Plugin = {
