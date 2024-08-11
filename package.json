@@ -14,13 +14,8 @@
   "keywords": [],
   "sideEffects": false,
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs"
-    },
-    "./client": {
-      "import": "./src/client/index.ts"
-    }
+    ".": "./dist/index.mjs",
+    "./client": "./src/client/index.ts"
   },
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",

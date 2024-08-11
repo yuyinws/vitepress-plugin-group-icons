@@ -12,6 +12,7 @@ export const builtInIcons: Record<string, string> = {
   next: 'logos:nextjs-icon',
   nuxt: 'logos:nuxt-icon',
   solid: 'logos:solidjs-icon',
+  astro: 'logos:astro-icon',
   // bundler
   rollup: 'logos:rollupjs',
   webpack: 'logos:webpack',
