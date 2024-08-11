@@ -47,7 +47,7 @@
     "typecheck": "tsc --noEmit",
     "prepare": "simple-git-hooks",
     "docs:dev": "vitepress dev docs",
-    "docs:build": "npm run build && vitepress build docs",
+    "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
   "peerDependencies": {
