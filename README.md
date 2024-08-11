@@ -11,7 +11,7 @@ Automatically fill the missing product icon for code groups.
 ![vp-plugin-group-icons](https://static.yuy1n.io/vp-plugin-group-icons.png)
 
 <p align='center'>
-<a href="https://utc.yuy1n.io">
+<a href="https://vpgi.vercel.app/">
 📜 Documentation
 </a>
 </p>
