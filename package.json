@@ -2,6 +2,7 @@
   "name": "vitepress-plugin-group-icons",
   "type": "module",
   "version": "0.0.6",
+  "packageManager": "pnpm@9.7.0",
   "author": "Leo <https://github.com/yuyinws>",
   "license": "MIT",
   "homepage": "https://github.com/yuyinws/vitepress-plugin-group-icons#readme",
