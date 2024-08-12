@@ -5,13 +5,15 @@ function groupIconRule(state: StateCore) {
   const groupNameRegex = /\[([^\]]+)\]/
 
   for (const token of state.tokens) {
-    const match = token.info.match(groupNameRegex)
-    if (match) {
-      const iconName = match[1]
-      token.info = token.info.replace(
-        groupNameRegex,
+    if (token.type === 'fence' && token.tag === 'code' && token.level === 1) {
+      const match = token.info.match(groupNameRegex)
+      if (match) {
+        const iconName = match[1]
+        token.info = token.info.replace(
+          groupNameRegex,
           `[<GroupIcon name="${iconName}" />]`,
-      )
+        )
+      }
     }
   }
 }
