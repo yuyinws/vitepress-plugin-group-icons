@@ -3,7 +3,7 @@
 layout: home
 
 hero:
-  name: "vitepress-plugin-group-icons"
+  name: "Vitepress Plugin Group Icons"
   tagline: Automatically fill the missing product icon for code groups.
   actions:
     - theme: brand
