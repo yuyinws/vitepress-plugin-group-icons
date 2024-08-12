@@ -38,7 +38,7 @@ export default defineConfig({
 })
 ```
 
-```ts {3,9}
+```ts {4,9}
 // .vitepress/theme/index.js
 import Theme from 'vitepress/theme'
 import type { EnhanceAppContext } from 'vitepress'
