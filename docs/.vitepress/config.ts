@@ -1,5 +1,9 @@
 import { defineConfig } from 'vitepress'
-import { groupIconPlugin } from 'vitepress-plugin-group-icons'
+import { vitePluginGroupIcons } from 'vitepress-plugin-group-icons'
+import Inspect from 'vite-plugin-inspect'
+
+// eslint-disable-next-line regexp/no-super-linear-backtracking
+const labelRE = /<label.*?>(.*?)<\/label>/g
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -27,8 +31,15 @@ export default defineConfig({
   },
   markdown: {
     config(md) {
-      md.use(groupIconPlugin)
+      const orig = md.renderer.rules['container_code-group_open']!
+      md.renderer.rules['container_code-group_open'] = (...args) =>
+        orig(...args).replace(
+          labelRE,
+          (match, label) =>
+            `<label data-label="${md.utils.escapeHtml(label)}"${match.slice(6)}`,
+        )
     },
+
   },
   head: [
     ['meta', { property: 'og:title', content: 'Vitepress Plugin Group Icons' }],
@@ -41,4 +52,10 @@ export default defineConfig({
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
     ['meta', { name: 'theme-color', content: '#4FC08D' }],
   ],
+  vite: {
+    plugins: [
+      vitePluginGroupIcons(),
+      Inspect(),
+    ],
+  },
 })
