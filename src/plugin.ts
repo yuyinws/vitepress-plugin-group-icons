@@ -17,7 +17,7 @@ export function groupIconPlugin(options?: Options): Plugin {
   options = options || { customIcon: {} }
 
   function handleUpdateModule() {
-    const mod = server!.moduleGraph.getModuleById(resolvedVirtualCssId)
+    const mod = server?.moduleGraph.getModuleById(resolvedVirtualCssId)
     if (mod) {
       server!.moduleGraph.invalidateModule(mod)
       server!.reloadModule(mod)
