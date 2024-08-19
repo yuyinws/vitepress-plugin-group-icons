@@ -1,6 +1,5 @@
 import { defineConfig } from 'vitepress'
 import { groupIconPlugin, localIconLoader } from 'vitepress-plugin-group-icons'
-import Inspect from 'vite-plugin-inspect'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -48,7 +47,6 @@ export default defineConfig({
           farm: localIconLoader(import.meta.url, '../assets/farm.svg'),
         },
       }),
-      Inspect(),
     ],
   },
 })
