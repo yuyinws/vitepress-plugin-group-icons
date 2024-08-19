@@ -5,14 +5,9 @@ layout: home
 hero:
   name: "Vitepress Plugin Group Icons"
   tagline: Automatically fill the missing product icon for code groups.
-  actions:
-    - theme: brand
-      text: Usage
-      link: /usage
-    - theme: alt
-      text: GitHub
-      link: https://github.com/yuyinws/vitepress-plugin-group-icons
 ---
+
+## Install
 
 ::: code-group
 
@@ -33,6 +28,24 @@ bun add vitepress-plugin-group-icons
 ```
 
 :::
+
+## Configuration
+
+```ts {3,8}
+// .vitepress/config.ts
+import { defineConfig } from 'vitepress'
+import { groupIconPlugin } from 'vitepress-plugin-group-icons'
+
+export default defineConfig({
+  vite: {
+    plugins: [
+      groupIconPlugin()
+    ],
+  }
+})
+```
+
+## Built-in Icons
 
 ::: code-group
 
@@ -62,6 +75,83 @@ Next.js
 
 ``` [Nuxt]
 Nuxt
+```
+
+:::
+
+::: details All built-in icons
+
+```ts
+export const builtInIcons: Record<string, string> = {
+  // package manager
+  pnpm: 'logos:pnpm',
+  npm: 'logos:npm-icon',
+  yarn: 'logos:yarn',
+  bun: 'logos:bun',
+  // framework
+  vue: 'logos:vue',
+  svelte: 'logos:svelte-icon',
+  angular: 'logos:angular-icon',
+  react: 'logos:react',
+  next: 'logos:nextjs-icon',
+  nuxt: 'logos:nuxt-icon',
+  solid: 'logos:solidjs-icon',
+  // bundler
+  rollup: 'logos:rollupjs',
+  webpack: 'logos:webpack',
+  vite: 'logos:vitejs',
+  esbuild: 'logos:esbuild',
+}
+```
+
+:::
+
+## Custom Icons
+
+> You can add any icons from [iconify](https://icon-sets.iconify.design/) or local svg file.
+
+```ts {3,9-15}
+// .vitepress/config.ts
+import { defineConfig } from 'vitepress'
+import { groupIconPlugin, localIconLoader } from 'vitepress-plugin-group-icons'
+
+export default defineConfig({
+  vite: {
+    plugins: [
+      groupIconPlugin({
+        customIcon: {
+          ae: 'logos:adobe-after-effects',
+          ai: 'logos:adobe-illustrator',
+          ps: 'logos:adobe-photoshop',
+          rspack: localIconLoader(import.meta.url, '../assets/rspack.svg'),
+          farm: localIconLoader(import.meta.url, '../assets/farm.svg'),
+        },
+      })
+    ],
+  }
+})
+```
+
+::: code-group
+
+``` [AE]
+AE
+```
+
+``` [AI]
+AI
+```
+
+``` [PS]
+PS
+```
+
+``` [Rspack]
+Rspack
+```
+
+``` [Farm]
+Farm
 ```
 
 :::

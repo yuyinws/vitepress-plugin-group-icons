@@ -11,6 +11,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@iconify-json/devicon": "^1.1.50",
+    "vite-plugin-inspect": "^0.8.5",
     "vitepress-plugin-group-icons": "workspace:*"
   }
 }

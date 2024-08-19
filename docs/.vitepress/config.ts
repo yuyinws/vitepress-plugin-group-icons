@@ -1,25 +1,11 @@
 import { defineConfig } from 'vitepress'
-import { groupIconPlugin } from 'vitepress-plugin-group-icons'
+import { groupIconPlugin, localIconLoader } from 'vitepress-plugin-group-icons'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'Vitepress Plugin Group Icons',
   description: 'Automatically fill the missing product icon for code groups.',
   themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
-    nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Usage', link: '/usage' },
-    ],
-
-    sidebar: [
-      {
-        items: [
-          { text: 'Usage', link: '/usage' },
-        ],
-      },
-    ],
-
     socialLinks: [
       { icon: 'github', link: 'https://github.com/yuyinws/vitepress-plugin-group-icons' },
     ],
@@ -27,8 +13,17 @@ export default defineConfig({
   },
   markdown: {
     config(md) {
-      md.use(groupIconPlugin)
+      // eslint-disable-next-line regexp/no-super-linear-backtracking
+      const labelRE = /<label.*?>(.*?)<\/label>/g
+      const orig = md.renderer.rules['container_code-group_open']!
+      md.renderer.rules['container_code-group_open'] = (...args) =>
+        orig(...args).replace(
+          labelRE,
+          (match, label) =>
+            `<label data-label="${md.utils.escapeHtml(label)}"${match.slice(6)}`,
+        )
     },
+
   },
   head: [
     ['meta', { property: 'og:title', content: 'Vitepress Plugin Group Icons' }],
@@ -41,4 +36,17 @@ export default defineConfig({
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
     ['meta', { name: 'theme-color', content: '#4FC08D' }],
   ],
+  vite: {
+    plugins: [
+      groupIconPlugin({
+        customIcon: {
+          ae: 'logos:adobe-after-effects',
+          ai: 'logos:adobe-illustrator',
+          ps: 'logos:adobe-photoshop',
+          rspack: localIconLoader(import.meta.url, '../assets/rspack.svg'),
+          farm: localIconLoader(import.meta.url, '../assets/farm.svg'),
+        },
+      }),
+    ],
+  },
 })
