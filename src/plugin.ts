@@ -47,29 +47,32 @@ export function groupIconPlugin(options?: Options): Plugin {
       return undefined
     },
     transform(code, id) {
-      if (id.endsWith('.md')) {
-        while (true) {
-          const match = labelMatchRegex.exec(code)
-          if (!match)
-            break
-          labelMatchs.add(match[1])
-        }
+      if (!id.endsWith('.md'))
+        return
+
+      let hasMatch = false
+      while (true) {
+        const match = labelMatchRegex.exec(code)
+        if (!match)
+          break
+        labelMatchs.add(match[1])
+        hasMatch = true
       }
-    },
-    transformIndexHtml: {
-      handler() {
+
+      if (hasMatch) {
         handleUpdateModule()
-      },
+      }
     },
     handleHotUpdate(ctx) {
-      if (ctx.file.endsWith('.md')) {
-        setTimeout(() => {
-          // Update module when label changes, avoid too many HMR
-          if (!isSetEqual(labelMatchs, oldLabelMatchs)) {
-            handleUpdateModule()
-          }
-        }, 100)
-      }
+      if (!ctx.file.endsWith('.md'))
+        return
+
+      setTimeout(() => {
+        // Update module when label changes, avoid too many HMR
+        if (!isSetEqual(labelMatchs, oldLabelMatchs)) {
+          handleUpdateModule()
+        }
+      }, 100)
     },
   }
 }
