@@ -7,6 +7,6 @@ export default defineBuildConfig({
   declaration: true,
   clean: true,
   externals: [
-    'markdown-it',
+    'vite',
   ],
 })

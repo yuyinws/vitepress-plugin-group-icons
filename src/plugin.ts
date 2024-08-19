@@ -1,7 +1,7 @@
 import type { Plugin, ViteDevServer } from 'vite'
 import { generateCSS } from './codegen'
 
-export function vitePluginGroupIcons(): Plugin {
+export function groupIconsPlugin(): Plugin {
   const virtualCssId = 'virtual:group-icons.css'
   const resolvedVirtualCssId = `\0${virtualCssId}`
   const labels = new Set<string>()

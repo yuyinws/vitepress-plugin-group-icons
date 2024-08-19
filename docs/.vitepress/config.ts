@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import { vitePluginGroupIcons } from 'vitepress-plugin-group-icons'
+import { groupIconsPlugin } from 'vitepress-plugin-group-icons'
 import Inspect from 'vite-plugin-inspect'
 
 // eslint-disable-next-line regexp/no-super-linear-backtracking
@@ -54,7 +54,7 @@ export default defineConfig({
   ],
   vite: {
     plugins: [
-      vitePluginGroupIcons(),
+      groupIconsPlugin(),
       Inspect(),
     ],
   },
