@@ -52,6 +52,14 @@ export default defineConfig({
 })
 ```
 
+```ts
+// .vitepress/theme/index.ts
+import Theme from 'vitepress/theme'
+import 'virtual:group-icons.css'
+
+export default Theme
+```
+
 ### Built-in Icons
 
 ```ts
