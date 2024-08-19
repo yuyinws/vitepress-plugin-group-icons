@@ -1,29 +1,44 @@
 import { getIconData } from '@iconify/utils'
 import { encodeSvgForCss } from '@iconify/utils/lib/svg/encode-svg-for-css'
+import type { Options } from './plugin'
 
 async function getCSS(iconName: string, label: string) {
-  const [collection, icon] = iconName.split(':')
-
-  const { icons } = await import(`@iconify-json/${collection}`)
-
-  const iconData = getIconData(icons, icon)
-
-  if (iconData) {
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${iconData.width} ${iconData.height}'>${iconData.body}</svg>`
-
+  if (iconName.startsWith('<')) {
     return `
 .vp-code-group [data-label^='${label}']::before {
   content: '';
+  --icon: url("data:image/svg+xml,${encodeSvgForCss(iconName)}");
+}`
+  }
+  else {
+    const [collection, icon] = iconName.split(':')
+
+    const { icons } = await import(`@iconify-json/${collection}`)
+
+    const iconData = getIconData(icons, icon)
+
+    if (iconData) {
+      const top = iconData.top || 0
+      const left = iconData.left || 0
+      const width = iconData.width || 0
+      const height = iconData.height || 0
+
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${top} ${left} ${width} ${height}'>${iconData.body}</svg>`
+
+      return `
+.vp-code-group [data-label^='${label}']::before {
+  content: '';
   --icon: url("data:image/svg+xml,${encodeSvgForCss(svg)}");
-}
-    `
+}`
+    }
   }
 
   return ''
 }
 
-export async function generateCSS(labels: Set<string>) {
-  let css = `.vp-code-group [data-label]::before {
+export async function generateCSS(labels: Set<string>, options: Options) {
+  let css = `
+.vp-code-group [data-label]::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -54,10 +69,15 @@ export async function generateCSS(labels: Set<string>) {
     esbuild: 'logos:esbuild',
   }
 
+  const mergedIcons = {
+    ...builtInIcons,
+    ...options.customIcon,
+  }
+
   for (const label of labels) {
-    const findKey = Object.keys(builtInIcons).find(key => label?.toLowerCase().includes(key))
+    const findKey = Object.keys(mergedIcons).find(key => label?.toLowerCase().includes(key))
     if (findKey) {
-      css += await getCSS(builtInIcons[findKey], label)
+      css += await getCSS(mergedIcons[findKey], label)
     }
   }
 

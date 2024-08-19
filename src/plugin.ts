@@ -1,13 +1,19 @@
 import type { Plugin, ViteDevServer } from 'vite'
 import { generateCSS } from './codegen'
 
-export function groupIconsPlugin(): Plugin {
+export interface Options {
+  customIcon: Record<string, string>
+}
+
+export function groupIconsPlugin(options?: Options): Plugin {
   const virtualCssId = 'virtual:group-icons.css'
   const resolvedVirtualCssId = `\0${virtualCssId}`
   const labels = new Set<string>()
   const labelRegex = /<label[^>]+\bdata-label=\\"([^"]*)\\"|<label[^>]+\bdata-label="[^"]*"/g
   let server: ViteDevServer | undefined
   let cssContent = ''
+
+  options = options || { customIcon: {} }
 
   return {
     name: 'vitepress-plugin-group-icons',
@@ -24,7 +30,7 @@ export function groupIconsPlugin(): Plugin {
 
     async load(id) {
       if (id === resolvedVirtualCssId) {
-        const { css } = await generateCSS(labels)
+        const { css } = await generateCSS(labels, options)
         cssContent = css
 
         return cssContent
@@ -46,7 +52,7 @@ export function groupIconsPlugin(): Plugin {
       async handler() {
         const mod = server!.moduleGraph.getModuleById(resolvedVirtualCssId)
         if (mod) {
-          const { css } = await generateCSS(labels)
+          const { css } = await generateCSS(labels, options)
           cssContent = css
           server!.moduleGraph.invalidateModule(mod)
           server!.reloadModule(mod)

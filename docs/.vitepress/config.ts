@@ -1,9 +1,6 @@
 import { defineConfig } from 'vitepress'
-import { groupIconsPlugin } from 'vitepress-plugin-group-icons'
+import { groupIconsPlugin, localIconLoader } from 'vitepress-plugin-group-icons'
 import Inspect from 'vite-plugin-inspect'
-
-// eslint-disable-next-line regexp/no-super-linear-backtracking
-const labelRE = /<label.*?>(.*?)<\/label>/g
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -31,6 +28,8 @@ export default defineConfig({
   },
   markdown: {
     config(md) {
+      // eslint-disable-next-line regexp/no-super-linear-backtracking
+      const labelRE = /<label.*?>(.*?)<\/label>/g
       const orig = md.renderer.rules['container_code-group_open']!
       md.renderer.rules['container_code-group_open'] = (...args) =>
         orig(...args).replace(
@@ -54,7 +53,15 @@ export default defineConfig({
   ],
   vite: {
     plugins: [
-      groupIconsPlugin(),
+      groupIconsPlugin({
+        customIcon: {
+          ae: 'logos:adobe-after-effects',
+          ai: 'logos:adobe-illustrator',
+          ps: 'logos:adobe-photoshop',
+          rspack: localIconLoader(import.meta.url, '../assets/rspack.svg'),
+          farm: localIconLoader(import.meta.url, '../assets/farm.svg'),
+        },
+      }),
       Inspect(),
     ],
   },

@@ -16,7 +16,7 @@ yarn add vitepress-plugin-group-icons
 pnpm add vitepress-plugin-group-icons
 ```
 
-```sh [bun]
+```sh [esbuild]
 bun add vitepress-plugin-group-icons
 ```
 
