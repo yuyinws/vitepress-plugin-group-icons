@@ -1,5 +1,6 @@
 import type { Plugin, ViteDevServer } from 'vite'
 import { generateCSS } from './codegen'
+import { isSetEqual } from './utils'
 
 export interface Options {
   customIcon: Record<string, string>
@@ -9,6 +10,7 @@ export function groupIconPlugin(options?: Options): Plugin {
   const virtualCssId = 'virtual:group-icons.css'
   const resolvedVirtualCssId = `\0${virtualCssId}`
   const labelMatchs = new Set<string>()
+  let oldLabelMatchs: Set<string>
   const labelMatchRegex = /<label[^>]+\bdata-label=\\"([^"]*)\\"|<label[^>]+\bdata-label="[^"]*"/g
   let server: ViteDevServer | undefined
 
@@ -38,7 +40,7 @@ export function groupIconPlugin(options?: Options): Plugin {
     async load(id) {
       if (id === resolvedVirtualCssId) {
         const { css } = await generateCSS(labelMatchs, options)
-
+        oldLabelMatchs = new Set(labelMatchs)
         return css
       }
 
@@ -62,7 +64,9 @@ export function groupIconPlugin(options?: Options): Plugin {
     handleHotUpdate(ctx) {
       if (ctx.file.endsWith('.md')) {
         setTimeout(() => {
-          handleUpdateModule()
+          if (!isSetEqual(labelMatchs, oldLabelMatchs)) {
+            handleUpdateModule()
+          }
         }, 100)
       }
     },
