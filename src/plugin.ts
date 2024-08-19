@@ -64,6 +64,7 @@ export function groupIconPlugin(options?: Options): Plugin {
     handleHotUpdate(ctx) {
       if (ctx.file.endsWith('.md')) {
         setTimeout(() => {
+          // Update module when label changes, avoid too many HMR
           if (!isSetEqual(labelMatchs, oldLabelMatchs)) {
             handleUpdateModule()
           }
