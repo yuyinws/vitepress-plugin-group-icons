@@ -1,6 +1,7 @@
 import type { Plugin, ViteDevServer } from 'vite'
 import { generateCSS } from './codegen'
 import { isSetEqual } from './utils'
+// import { isSetEqual } from './utils'
 
 export interface Options {
   customIcon: Record<string, string>
@@ -50,29 +51,16 @@ export function groupIconPlugin(options?: Options): Plugin {
       if (!id.endsWith('.md'))
         return
 
-      let hasMatch = false
       while (true) {
         const match = labelMatchRegex.exec(code)
         if (!match)
           break
         labelMatchs.add(match[1])
-        hasMatch = true
       }
 
-      if (hasMatch) {
+      if (!isSetEqual(labelMatchs, oldLabelMatchs)) {
         handleUpdateModule()
       }
-    },
-    handleHotUpdate(ctx) {
-      if (!ctx.file.endsWith('.md'))
-        return
-
-      setTimeout(() => {
-        // Update module when label changes, avoid too many HMR
-        if (!isSetEqual(labelMatchs, oldLabelMatchs)) {
-          handleUpdateModule()
-        }
-      }, 100)
     },
   }
 }
