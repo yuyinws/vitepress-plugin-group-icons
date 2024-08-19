@@ -8,10 +8,10 @@ export interface Options {
 export function groupIconsPlugin(options?: Options): Plugin {
   const virtualCssId = 'virtual:group-icons.css'
   const resolvedVirtualCssId = `\0${virtualCssId}`
-  const labels = new Set<string>()
-  const labelRegex = /<label[^>]+\bdata-label=\\"([^"]*)\\"|<label[^>]+\bdata-label="[^"]*"/g
+  const labelMatchs = new Set<string>()
+  const labelMatchRegex = /<label[^>]+\bdata-label=\\"([^"]*)\\"|<label[^>]+\bdata-label="[^"]*"/g
   let server: ViteDevServer | undefined
-  let cssContent = ''
+  let virtualCss = ''
 
   options = options || { customIcon: {} }
 
@@ -30,10 +30,10 @@ export function groupIconsPlugin(options?: Options): Plugin {
 
     async load(id) {
       if (id === resolvedVirtualCssId) {
-        const { css } = await generateCSS(labels, options)
-        cssContent = css
+        const { css } = await generateCSS(labelMatchs, options)
+        virtualCss = css
 
-        return cssContent
+        return virtualCss
       }
 
       return undefined
@@ -41,10 +41,10 @@ export function groupIconsPlugin(options?: Options): Plugin {
     transform(code, id) {
       if (id.endsWith('.md')) {
         while (true) {
-          const match = labelRegex.exec(code)
+          const match = labelMatchRegex.exec(code)
           if (!match)
             break
-          labels.add(match[1])
+          labelMatchs.add(match[1])
         }
       }
     },
@@ -52,12 +52,23 @@ export function groupIconsPlugin(options?: Options): Plugin {
       async handler() {
         const mod = server!.moduleGraph.getModuleById(resolvedVirtualCssId)
         if (mod) {
-          const { css } = await generateCSS(labels, options)
-          cssContent = css
+          const { css } = await generateCSS(labelMatchs, options)
+          virtualCss = css
           server!.moduleGraph.invalidateModule(mod)
           server!.reloadModule(mod)
         }
       },
+    },
+    handleHotUpdate(ctx) {
+      if (ctx.file.endsWith('.md')) {
+        const mod = server!.moduleGraph.getModuleById(resolvedVirtualCssId)
+        if (mod) {
+          setTimeout(() => {
+            server!.moduleGraph.invalidateModule(mod)
+            server!.reloadModule(mod)
+          }, 100)
+        }
+      }
     },
   }
 }

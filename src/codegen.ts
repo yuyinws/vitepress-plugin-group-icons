@@ -2,20 +2,20 @@ import { getIconData } from '@iconify/utils'
 import { encodeSvgForCss } from '@iconify/utils/lib/svg/encode-svg-for-css'
 import type { Options } from './plugin'
 
-async function getCSS(iconName: string, label: string) {
-  if (iconName.startsWith('<')) {
+async function getCSS(icon: string, label: string) {
+  if (icon.startsWith('<svg')) {
     return `
 .vp-code-group [data-label^='${label}']::before {
   content: '';
-  --icon: url("data:image/svg+xml,${encodeSvgForCss(iconName)}");
+  --icon: url("data:image/svg+xml,${encodeSvgForCss(icon)}");
 }`
   }
   else {
-    const [collection, icon] = iconName.split(':')
+    const [collection, iconName] = icon.split(':')
 
     const { icons } = await import(`@iconify-json/${collection}`)
 
-    const iconData = getIconData(icons, icon)
+    const iconData = getIconData(icons, iconName)
 
     if (iconData) {
       const top = iconData.top || 0
