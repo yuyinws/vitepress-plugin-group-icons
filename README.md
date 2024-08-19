@@ -44,26 +44,12 @@ import { defineConfig } from 'vitepress'
 import { groupIconPlugin } from 'vitepress-plugin-group-icons'
 
 export default defineConfig({
-  markdown: {
-    config(md) {
-      md.use(groupIconPlugin)
-    }
+  vite: {
+    plugins: [
+      groupIconPlugin()
+    ],
   }
 })
-```
-
-```ts
-// .vitepress/theme/index.js
-import Theme from 'vitepress/theme'
-import type { EnhanceAppContext } from 'vitepress'
-import { GroupIconComponent } from 'vitepress-plugin-group-icons/client'
-
-export default {
-  ...Theme,
-  enhanceApp({ app }: EnhanceAppContext) {
-    app.use(GroupIconComponent)
-  },
-}
 ```
 
 ### Built-in Icons
@@ -96,24 +82,25 @@ export const builtInIcons: Record<string, string> = {
 > You can add any icons from [iconify](https://icon-sets.iconify.design/) or local svg file.
 
 ```ts
-import Theme from 'vitepress/theme'
-import type { EnhanceAppContext } from 'vitepress'
-import { GroupIconComponent } from 'vitepress-plugin-group-icons/client'
-import rspack from '../../assets/rspack.svg?raw'
-import farm from '../../assets/farm.svg?raw'
+// .vitepress/config.ts
+import { defineConfig } from 'vitepress'
+import { groupIconPlugin, localIconLoader } from 'vitepress-plugin-group-icons'
 
-export default {
-  ...Theme,
-  enhanceApp({ app }: EnhanceAppContext) {
-    app.use(GroupIconComponent, {
-      ae: 'logos:adobe-after-effects',
-      ai: 'logos:adobe-illustrator',
-      ps: 'logos:adobe-photoshop',
-      rspack,
-      farm,
-    })
-  },
-}
+export default defineConfig({
+  vite: {
+    plugins: [
+      groupIconPlugin({
+        customIcon: {
+          ae: 'logos:adobe-after-effects',
+          ai: 'logos:adobe-illustrator',
+          ps: 'logos:adobe-photoshop',
+          rspack: localIconLoader(import.meta.url, '../assets/rspack.svg'),
+          farm: localIconLoader(import.meta.url, '../assets/farm.svg'),
+        },
+      })
+    ],
+  }
+})
 ```
 
 ## License
