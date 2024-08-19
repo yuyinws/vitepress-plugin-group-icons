@@ -1,7 +1,6 @@
 import type { Plugin, ViteDevServer } from 'vite'
 import { generateCSS } from './codegen'
 import { isSetEqual } from './utils'
-// import { isSetEqual } from './utils'
 
 export interface Options {
   customIcon: Record<string, string>
