@@ -16,7 +16,7 @@ yarn add vitepress-plugin-group-icons
 pnpm add vitepress-plugin-group-icons
 ```
 
-```sh [esbuild]
+```sh [bun]
 bun add vitepress-plugin-group-icons
 ```
 
@@ -30,26 +30,12 @@ import { defineConfig } from 'vitepress'
 import { groupIconPlugin } from 'vitepress-plugin-group-icons'
 
 export default defineConfig({
-  markdown: {
-    config(md) {
-      md.use(groupIconPlugin)
-    }
+  vite: {
+    plugins: [
+      groupIconPlugin()
+    ],
   }
 })
-```
-
-```ts {4,9}
-// .vitepress/theme/index.js
-import Theme from 'vitepress/theme'
-import type { EnhanceAppContext } from 'vitepress'
-import { GroupIconComponent } from 'vitepress-plugin-group-icons/client'
-
-export default {
-  ...Theme,
-  enhanceApp({ app }: EnhanceAppContext) {
-    app.use(GroupIconComponent)
-  },
-}
 ```
 
 ## Built-in Icons
@@ -117,25 +103,26 @@ export const builtInIcons: Record<string, string> = {
 
 > You can add any icons from [iconify](https://icon-sets.iconify.design/) or local svg file.
 
-```ts {4,5,11-15}
-import Theme from 'vitepress/theme'
-import type { EnhanceAppContext } from 'vitepress'
-import { GroupIconComponent } from 'vitepress-plugin-group-icons/client'
-import rspack from '../../assets/rspack.svg?raw'
-import farm from '../../assets/farm.svg?raw'
+```ts {3,9-15}
+// .vitepress/config.ts
+import { defineConfig } from 'vitepress'
+import { groupIconPlugin, localIconLoader } from 'vitepress-plugin-group-icons'
 
-export default {
-  ...Theme,
-  enhanceApp({ app }: EnhanceAppContext) {
-    app.use(GroupIconComponent, {
-      ae: 'logos:adobe-after-effects',
-      ai: 'logos:adobe-illustrator',
-      ps: 'logos:adobe-photoshop',
-      rspack,
-      farm,
-    })
-  },
-}
+export default defineConfig({
+  vite: {
+    plugins: [
+      groupIconPlugin({
+        customIcon: {
+          ae: 'logos:adobe-after-effects',
+          ai: 'logos:adobe-illustrator',
+          ps: 'logos:adobe-photoshop',
+          rspack: localIconLoader(import.meta.url, '../assets/rspack.svg'),
+          farm: localIconLoader(import.meta.url, '../assets/farm.svg'),
+        },
+      })
+    ],
+  }
+})
 ```
 
 ::: code-group

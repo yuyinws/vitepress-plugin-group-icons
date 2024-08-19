@@ -5,15 +5,22 @@ export interface Options {
   customIcon: Record<string, string>
 }
 
-export function groupIconsPlugin(options?: Options): Plugin {
+export function groupIconPlugin(options?: Options): Plugin {
   const virtualCssId = 'virtual:group-icons.css'
   const resolvedVirtualCssId = `\0${virtualCssId}`
   const labelMatchs = new Set<string>()
   const labelMatchRegex = /<label[^>]+\bdata-label=\\"([^"]*)\\"|<label[^>]+\bdata-label="[^"]*"/g
   let server: ViteDevServer | undefined
-  let virtualCss = ''
 
   options = options || { customIcon: {} }
+
+  function handleUpdateModule() {
+    const mod = server!.moduleGraph.getModuleById(resolvedVirtualCssId)
+    if (mod) {
+      server!.moduleGraph.invalidateModule(mod)
+      server!.reloadModule(mod)
+    }
+  }
 
   return {
     name: 'vitepress-plugin-group-icons',
@@ -31,9 +38,8 @@ export function groupIconsPlugin(options?: Options): Plugin {
     async load(id) {
       if (id === resolvedVirtualCssId) {
         const { css } = await generateCSS(labelMatchs, options)
-        virtualCss = css
 
-        return virtualCss
+        return css
       }
 
       return undefined
@@ -49,25 +55,15 @@ export function groupIconsPlugin(options?: Options): Plugin {
       }
     },
     transformIndexHtml: {
-      async handler() {
-        const mod = server!.moduleGraph.getModuleById(resolvedVirtualCssId)
-        if (mod) {
-          const { css } = await generateCSS(labelMatchs, options)
-          virtualCss = css
-          server!.moduleGraph.invalidateModule(mod)
-          server!.reloadModule(mod)
-        }
+      handler() {
+        handleUpdateModule()
       },
     },
     handleHotUpdate(ctx) {
       if (ctx.file.endsWith('.md')) {
-        const mod = server!.moduleGraph.getModuleById(resolvedVirtualCssId)
-        if (mod) {
-          setTimeout(() => {
-            server!.moduleGraph.invalidateModule(mod)
-            server!.reloadModule(mod)
-          }, 100)
-        }
+        setTimeout(() => {
+          handleUpdateModule()
+        }, 100)
       }
     },
   }
