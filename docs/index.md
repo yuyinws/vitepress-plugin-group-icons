@@ -31,12 +31,17 @@ bun add vitepress-plugin-group-icons
 
 ## Configuration
 
-```ts {3,8}
+```ts {3,8,13}
 // .vitepress/config.ts
 import { defineConfig } from 'vitepress'
-import { groupIconPlugin } from 'vitepress-plugin-group-icons'
+import { groupIconPlugin, mdPlugin } from 'vitepress-plugin-group-icons'
 
 export default defineConfig({
+  markdown: {
+    config(md) {
+      md.use(mdPlugin)
+    },
+  },
   vite: {
     plugins: [
       groupIconPlugin()
@@ -118,12 +123,17 @@ export const builtInIcons: Record<string, string> = {
 
 > You can add any icons from [iconify](https://icon-sets.iconify.design/) or local svg file.
 
-```ts {3,9-15}
+```ts {3,14-20}
 // .vitepress/config.ts
 import { defineConfig } from 'vitepress'
-import { groupIconPlugin, localIconLoader } from 'vitepress-plugin-group-icons'
+import { groupIconPlugin, localIconLoader, mdPlugin } from 'vitepress-plugin-group-icons'
 
 export default defineConfig({
+  markdown: {
+    config(md) {
+      md.use(mdPlugin)
+    },
+  },
   vite: {
     plugins: [
       groupIconPlugin({
