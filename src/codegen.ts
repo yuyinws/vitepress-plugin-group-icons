@@ -1,11 +1,11 @@
 import { getIconData } from '@iconify/utils'
 import { encodeSvgForCss } from '@iconify/utils/lib/svg/encode-svg-for-css'
-import type { Options } from './plugin'
+import type { Options } from './vite'
 
 async function getCSS(icon: string, label: string) {
   if (icon.startsWith('<svg')) {
     return `
-.vp-code-group [data-label^='${label}']::before {
+.vp-code-group [data-title^='${label}']::before {
   content: '';
   --icon: url("data:image/svg+xml,${encodeSvgForCss(icon)}");
 }`
@@ -26,7 +26,7 @@ async function getCSS(icon: string, label: string) {
       const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${top} ${left} ${width} ${height}'>${iconData.body}</svg>`
 
       return `
-.vp-code-group [data-label^='${label}']::before {
+.vp-code-group [data-title^='${label}']::before {
   content: '';
   --icon: url("data:image/svg+xml,${encodeSvgForCss(svg)}");
 }`
@@ -38,7 +38,7 @@ async function getCSS(icon: string, label: string) {
 
 export async function generateCSS(labels: Set<string>, options: Options) {
   let css = `
-.vp-code-group [data-label]::before {
+.vp-code-group [data-title]::before {
   display: inline-block;
   width: 1em;
   height: 1em;
