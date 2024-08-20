@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module'
 import { getIconData } from '@iconify/utils'
 import { encodeSvgForCss } from '@iconify/utils/lib/svg/encode-svg-for-css'
 import type { Options } from './vite'
@@ -13,7 +14,8 @@ async function getCSS(icon: string, label: string) {
   else {
     const [collection, iconName] = icon.split(':')
 
-    const { icons } = await import(`@iconify-json/${collection}`)
+    // https://github.com/nodejs/node/issues/51347#issuecomment-2111337854
+    const { icons } = createRequire(import.meta.url)(`@iconify-json/${collection}`)
 
     const iconData = getIconData(icons, iconName)
 
