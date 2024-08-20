@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitepress'
-import { groupIconPlugin, localIconLoader } from 'vitepress-plugin-group-icons'
+import { localIconLoader, mdPlugin, vitePlugin } from 'vitepress-plugin-group-icons'
+import Inspect from 'vite-plugin-inspect'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -13,15 +14,7 @@ export default defineConfig({
   },
   markdown: {
     config(md) {
-      // eslint-disable-next-line regexp/no-super-linear-backtracking
-      const labelRE = /<label.*?>(.*?)<\/label>/g
-      const orig = md.renderer.rules['container_code-group_open']!
-      md.renderer.rules['container_code-group_open'] = (...args) =>
-        orig(...args).replace(
-          labelRE,
-          (match, label) =>
-            `<label data-label="${md.utils.escapeHtml(label)}"${match.slice(6)}`,
-        )
+      md.use(mdPlugin)
     },
 
   },
@@ -38,7 +31,7 @@ export default defineConfig({
   ],
   vite: {
     plugins: [
-      groupIconPlugin({
+      vitePlugin({
         customIcon: {
           ae: 'logos:adobe-after-effects',
           ai: 'logos:adobe-illustrator',
@@ -47,6 +40,7 @@ export default defineConfig({
           farm: localIconLoader(import.meta.url, '../assets/farm.svg'),
         },
       }),
+      Inspect(),
     ],
   },
 })

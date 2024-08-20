@@ -21,6 +21,9 @@ importers:
       '@antfu/ni':
         specifier: ^0.22.0
         version: 0.22.0
+      '@types/markdown-it':
+        specifier: ^14.1.2
+        version: 14.1.2
       '@types/node':
         specifier: ^20.14.11
         version: 20.14.11

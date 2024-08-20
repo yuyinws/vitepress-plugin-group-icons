@@ -6,12 +6,12 @@ export interface Options {
   customIcon: Record<string, string>
 }
 
-export function groupIconPlugin(options?: Options): Plugin {
+export function vitePlugin(options?: Options): Plugin {
   const virtualCssId = 'virtual:group-icons.css'
   const resolvedVirtualCssId = `\0${virtualCssId}`
   const labelMatchs = new Set<string>()
   let oldLabelMatchs: Set<string>
-  const labelMatchRegex = /<label[^>]+\bdata-label=\\"([^"]*)\\"|<label[^>]+\bdata-label="[^"]*"/g
+  const labelMatchRegex = /<label[^>]+\bdata-title=\\"([^"]*)\\"|<label[^>]+\bdata-title="[^"]*"/g
   let server: ViteDevServer | undefined
 
   options = options || { customIcon: {} }
