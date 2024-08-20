@@ -6,7 +6,7 @@ export interface Options {
   customIcon: Record<string, string>
 }
 
-export function vitePlugin(options?: Options): Plugin {
+export function groupIconVitePlugin(options?: Options): Plugin {
   const virtualCssId = 'virtual:group-icons.css'
   const resolvedVirtualCssId = `\0${virtualCssId}`
   const labelMatchs = new Set<string>()

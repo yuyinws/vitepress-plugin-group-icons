@@ -34,17 +34,17 @@ bun add vitepress-plugin-group-icons
 ```ts {3,8,13}
 // .vitepress/config.ts
 import { defineConfig } from 'vitepress'
-import { groupIconPlugin, mdPlugin } from 'vitepress-plugin-group-icons'
+import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 
 export default defineConfig({
   markdown: {
     config(md) {
-      md.use(mdPlugin)
+      md.use(groupIconMdPlugin)
     },
   },
   vite: {
     plugins: [
-      groupIconPlugin()
+      groupIconVitePlugin()
     ],
   }
 })
@@ -126,17 +126,17 @@ export const builtInIcons: Record<string, string> = {
 ```ts {3,14-20}
 // .vitepress/config.ts
 import { defineConfig } from 'vitepress'
-import { groupIconPlugin, localIconLoader, mdPlugin } from 'vitepress-plugin-group-icons'
+import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
 
 export default defineConfig({
   markdown: {
     config(md) {
-      md.use(mdPlugin)
+      md.use(groupIconMdPlugin)
     },
   },
   vite: {
     plugins: [
-      groupIconPlugin({
+      groupIconVitePlugin({
         customIcon: {
           ae: 'logos:adobe-after-effects',
           ai: 'logos:adobe-illustrator',

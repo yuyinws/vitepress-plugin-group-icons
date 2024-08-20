@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import { localIconLoader, mdPlugin, vitePlugin } from 'vitepress-plugin-group-icons'
+import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
 import Inspect from 'vite-plugin-inspect'
 
 // https://vitepress.dev/reference/site-config
@@ -14,7 +14,7 @@ export default defineConfig({
   },
   markdown: {
     config(md) {
-      md.use(mdPlugin)
+      md.use(groupIconMdPlugin)
     },
 
   },
@@ -31,7 +31,7 @@ export default defineConfig({
   ],
   vite: {
     plugins: [
-      vitePlugin({
+      groupIconVitePlugin({
         customIcon: {
           ae: 'logos:adobe-after-effects',
           ai: 'logos:adobe-illustrator',
