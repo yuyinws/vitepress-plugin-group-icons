@@ -26,6 +26,7 @@ export function groupIconVitePlugin(options?: Options): Plugin {
 
   return {
     name: 'vitepress-plugin-group-icons',
+    enforce: 'post',
     resolveId(id) {
       if (id === virtualCssId) {
         return resolvedVirtualCssId
