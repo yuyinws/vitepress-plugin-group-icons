@@ -75,7 +75,7 @@ React
 ```
 
 ``` [Angular]
-React
+Angular
 ```
 
 ``` [Solid]
