@@ -1,7 +1,7 @@
 import type Markdown from 'markdown-it'
 
 export function groupIconMdPlugin(md: Markdown) {
-  const labelRE = /<label\b[^>]*>(.*?)<\/label>/g
+  const labelRE = /<label\b(?![^>]+\bdata-title\b)[^>]*>(.*?)<\/label>/g
 
   type RenderRuleParams = Parameters<NonNullable<typeof md.renderer.rules['container_code-group_open']>>
 
