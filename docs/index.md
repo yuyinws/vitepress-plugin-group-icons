@@ -59,7 +59,8 @@ export default Theme
 ```
 
 ## Usage Example
-````
+
+````md
 ::: code-group
 
 ```sh [npm]
