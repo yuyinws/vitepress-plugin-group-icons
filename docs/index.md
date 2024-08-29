@@ -58,6 +58,29 @@ import 'virtual:group-icons.css'
 export default Theme
 ```
 
+## Usage Example
+<pre style="background-color:var(--vp-code-block-bg);padding:24px;border-radius:8px;">
+::: code-group
+
+```sh [npm]
+npm install vitepress-plugin-group-icons
+```
+
+```sh [yarn]
+yarn add vitepress-plugin-group-icons
+```
+
+```sh [pnpm]
+pnpm add vitepress-plugin-group-icons
+```
+
+```sh [bun]
+bun add vitepress-plugin-group-icons
+```
+
+:::
+</pre>
+
 ## Built-in Icons
 
 ::: code-group
