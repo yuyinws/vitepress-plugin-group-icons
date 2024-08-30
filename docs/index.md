@@ -114,6 +114,10 @@ Next.js
 Nuxt
 ```
 
+``` [Deno]
+Deno
+```
+
 :::
 
 ::: details All built-in icons

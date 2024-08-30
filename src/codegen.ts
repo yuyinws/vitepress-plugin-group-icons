@@ -55,6 +55,7 @@ export async function generateCSS(labels: Set<string>, options: Options) {
     npm: 'logos:npm-icon',
     yarn: 'logos:yarn',
     bun: 'logos:bun',
+    deno: 'logos:deno',
     // framework
     vue: 'logos:vue',
     svelte: 'logos:svelte-icon',
