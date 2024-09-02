@@ -19,4 +19,11 @@ describe('generate css', () => {
       },
     })).toMatchSnapshot()
   })
+
+  it('duplicate label', async () => {
+    const labels = new Set(['foo.ts', 'bar.ts'])
+    expect(await generateCSS(labels, {
+      customIcon: {},
+    })).toMatchSnapshot()
+  })
 })

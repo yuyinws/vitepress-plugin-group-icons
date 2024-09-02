@@ -84,66 +84,132 @@ bun add vitepress-plugin-group-icons
 
 ## Built-in Icons
 
+### Package Managers
+
 ::: code-group
 
-``` [Vue]
-Vue
+``` [npm]
 ```
 
-``` [Svelte]
-Svelte
+``` [yarn]
 ```
 
-``` [React]
-React
+``` [pnpm]
 ```
 
-``` [Angular]
-Angular
-```
-
-``` [Solid]
-Solid
-```
-
-``` [Next.js]
-Next.js
-```
-
-``` [Nuxt]
-Nuxt
-```
-
-``` [Deno]
-Deno
+``` [bun]
 ```
 
 :::
 
-::: details All built-in icons
+### Frameworks
 
-```ts
-export const builtInIcons: Record<string, string> = {
-  // package manager
-  pnpm: 'logos:pnpm',
-  npm: 'logos:npm-icon',
-  yarn: 'logos:yarn',
-  bun: 'logos:bun',
-  // framework
-  vue: 'logos:vue',
-  svelte: 'logos:svelte-icon',
-  angular: 'logos:angular-icon',
-  react: 'logos:react',
-  next: 'logos:nextjs-icon',
-  nuxt: 'logos:nuxt-icon',
-  solid: 'logos:solidjs-icon',
-  // bundler
-  rollup: 'logos:rollupjs',
-  webpack: 'logos:webpack',
-  vite: 'logos:vitejs',
-  esbuild: 'logos:esbuild',
-}
+::: code-group
+
+``` [Vue]
 ```
+
+``` [Svelte]
+```
+
+``` [Angular]
+```
+
+``` [React]
+```
+
+``` [Solid]
+```
+
+``` [Astro]
+```
+
+``` [Next]
+```
+
+``` [Nuxt]
+```
+
+:::
+
+### Bundlers
+
+::: code-group
+
+``` [Rollup]
+```
+
+``` [Webpack]
+```
+
+``` [Vite]
+```
+
+``` [esbuild]
+```
+
+:::
+
+### Configuration Files
+
+::: code-group
+
+``` [package.json]
+```
+
+``` [tsconfig.json]
+```
+
+``` [eslint.config.js]
+```
+
+``` [.gitignore]
+```
+
+``` [.env]
+```
+
+``` [.vscode/settings.json]
+```
+
+``` [tailwind.config.js]
+```
+
+``` [uno.config.ts]
+```
+
+:::
+
+### Filename Extension
+
+::: code-group
+
+``` [foo.ts]
+```
+
+``` [bar.ts]
+```
+
+``` [foo.js]
+```
+
+``` [foo.md]
+```
+
+``` [foo.py]
+```
+
+``` [foo.yml]
+```
+
+``` [foo.ico]
+```
+
+:::
+
+::: details Icon mapping
+
+<<< ../src/builtin.ts
 
 :::
 

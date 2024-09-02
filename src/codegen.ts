@@ -2,44 +2,10 @@ import { createRequire } from 'node:module'
 import { getIconData } from '@iconify/utils'
 import { encodeSvgForCss } from '@iconify/utils/lib/svg/encode-svg-for-css'
 import type { Options } from './vite'
-
-async function getCSS(icon: string, label: string) {
-  if (icon.startsWith('<svg')) {
-    return `
-.vp-code-group [data-title^='${label}']::before {
-  content: '';
-  --icon: url("data:image/svg+xml,${encodeSvgForCss(icon)}");
-}`
-  }
-  else {
-    const [collection, iconName] = icon.split(':')
-
-    // https://github.com/nodejs/node/issues/51347#issuecomment-2111337854
-    const { icons } = createRequire(import.meta.url)(`@iconify-json/${collection}`)
-
-    const iconData = getIconData(icons, iconName)
-
-    if (iconData) {
-      const top = iconData.top || 0
-      const left = iconData.left || 0
-      const width = iconData.width || 0
-      const height = iconData.height || 0
-
-      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${top} ${left} ${width} ${height}'>${iconData.body}</svg>`
-
-      return `
-.vp-code-group [data-title^='${label}']::before {
-  content: '';
-  --icon: url("data:image/svg+xml,${encodeSvgForCss(svg)}");
-}`
-    }
-  }
-
-  return ''
-}
+import { builtinIcons } from './builtin'
 
 export async function generateCSS(labels: Set<string>, options: Options) {
-  let css = `
+  const baseCSS = `
 .vp-code-group [data-title]::before {
   display: inline-block;
   width: 1em;
@@ -49,42 +15,55 @@ export async function generateCSS(labels: Set<string>, options: Options) {
   background: var(--icon) no-repeat center / contain;
 }`
 
-  const builtInIcons: Record<string, string> = {
-    // package manager
-    pnpm: 'logos:pnpm',
-    npm: 'logos:npm-icon',
-    yarn: 'logos:yarn',
-    bun: 'logos:bun',
-    deno: 'logos:deno',
-    // framework
-    vue: 'logos:vue',
-    svelte: 'logos:svelte-icon',
-    angular: 'logos:angular-icon',
-    react: 'logos:react',
-    next: 'logos:nextjs-icon',
-    nuxt: 'logos:nuxt-icon',
-    solid: 'logos:solidjs-icon',
-    astro: 'logos:astro-icon',
-    // bundler
-    rollup: 'logos:rollupjs',
-    webpack: 'logos:webpack',
-    vite: 'logos:vitejs',
-    esbuild: 'logos:esbuild',
-  }
+  const mergedIcons = { ...builtinIcons, ...options.customIcon }
+  const matched = getMatchedLabels(labels, mergedIcons)
 
-  const mergedIcons = {
-    ...builtInIcons,
-    ...options.customIcon,
-  }
+  const css = baseCSS + await generateIconCSS(matched)
+
+  return { css }
+}
+
+function getMatchedLabels(labels: Set<string>, icons: Record<string, string>) {
+  const matched: Record<string, string[]> = {}
 
   for (const label of labels) {
-    const findKey = Object.keys(mergedIcons).find(key => label?.toLowerCase().includes(key))
-    if (findKey) {
-      css += await getCSS(mergedIcons[findKey], label)
+    const key = Object.keys(icons).find(k => label?.toLowerCase().includes(k))
+    if (key) {
+      matched[icons[key]] = (matched[icons[key]] || []).concat(label)
     }
   }
 
-  return {
-    css,
+  return matched
+}
+
+async function generateIconCSS(matched: Record<string, string[]>) {
+  const iconCSS = await Promise.all(Object.entries(matched).map(async ([icon, labels]) => {
+    const svg = await getSVG(icon)
+    const selector = labels.map(label => `[data-title^='${label}']::before`).join(',')
+    return `
+${selector} {
+  content: '';
+  --icon: url("data:image/svg+xml,${svg}");
+}`
+  }))
+
+  return iconCSS.join('')
+}
+
+async function getSVG(icon: string) {
+  if (icon.startsWith('<svg')) {
+    return encodeSvgForCss(icon)
   }
+
+  const [collection, iconName] = icon.split(':')
+  const { icons } = createRequire(import.meta.url)(`@iconify-json/${collection}`)
+  const iconData = getIconData(icons, iconName)
+
+  if (iconData) {
+    const { top = 0, left = 0, width = 0, height = 0, body } = iconData
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${top} ${left} ${width} ${height}'>${body}</svg>`
+    return encodeSvgForCss(svg)
+  }
+
+  return ''
 }

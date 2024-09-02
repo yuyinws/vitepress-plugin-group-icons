@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@iconify-json/logos": "^1.1.44",
+    "@iconify-json/vscode-icons": "^1.2.0",
     "@iconify/utils": "^2.1.30"
   },
   "devDependencies": {
