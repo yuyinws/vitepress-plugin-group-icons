@@ -56,14 +56,20 @@ async function getSVG(icon: string) {
   }
 
   const [collection, iconName] = icon.split(':')
-  const { icons } = createRequire(import.meta.url)(`@iconify-json/${collection}`)
-  const iconData = getIconData(icons, iconName)
+  try {
+    const { icons } = createRequire(import.meta.url)(`@iconify-json/${collection}`)
+    const iconData = getIconData(icons, iconName)
 
-  if (iconData) {
-    const { top = 0, left = 0, width = 0, height = 0, body } = iconData
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${top} ${left} ${width} ${height}'>${body}</svg>`
-    return encodeSvgForCss(svg)
+    if (iconData) {
+      const { top = 0, left = 0, width = 0, height = 0, body } = iconData
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${top} ${left} ${width} ${height}'>${body}</svg>`
+      return encodeSvgForCss(svg)
+    }
+
+    return ''
   }
-
-  return ''
+  catch {
+    console.warn(`[vitepress-plugin-group-icons]: Icon set \`${collection}\` not found. Please install \`@iconify-json/${collection}\` first`)
+    return ''
+  }
 }
