@@ -44,6 +44,7 @@ export const builtinIcons = {
   '.md': 'vscode-icons:file-type-markdown',
   '.py': 'vscode-icons:file-type-python',
   '.ico': 'vscode-icons:file-type-favicon',
-  'yml': 'vscode-icons:file-type-light-yaml',
-  'yaml': 'vscode-icons:file-type-light-yaml',
+  '.html': 'vscode-icons:file-type-html',
+  '.yml': 'vscode-icons:file-type-light-yaml',
+  '.yaml': 'vscode-icons:file-type-light-yaml',
 }

@@ -33,11 +33,11 @@ export default defineConfig({
     plugins: [
       groupIconVitePlugin({
         customIcon: {
-          ae: 'logos:adobe-after-effects',
-          ai: 'logos:adobe-illustrator',
-          ps: 'logos:adobe-photoshop',
-          rspack: localIconLoader(import.meta.url, '../assets/rspack.svg'),
-          farm: localIconLoader(import.meta.url, '../assets/farm.svg'),
+          '.mdx': 'vscode-icons:file-type-light-mdx',
+          'babel': 'vscode-icons:file-type-light-babel2',
+          '.go': 'vscode-icons:file-type-go',
+          'rspack': localIconLoader(import.meta.url, '../assets/rspack.svg'),
+          'farm': localIconLoader(import.meta.url, '../assets/farm.svg'),
         },
       }),
       Inspect(),
