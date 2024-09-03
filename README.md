@@ -88,62 +88,6 @@ bun add vitepress-plugin-group-icons
 :::
 ````
 
-### Built-in Icons
-
-```ts
-export const builtInIcons: Record<string, string> = {
-  // package manager
-  pnpm: 'logos:pnpm',
-  npm: 'logos:npm-icon',
-  yarn: 'logos:yarn',
-  bun: 'logos:bun',
-  // framework
-  vue: 'logos:vue',
-  svelte: 'logos:svelte-icon',
-  angular: 'logos:angular-icon',
-  react: 'logos:react',
-  next: 'logos:nextjs-icon',
-  nuxt: 'logos:nuxt-icon',
-  solid: 'logos:solidjs-icon',
-  // bundler
-  rollup: 'logos:rollupjs',
-  webpack: 'logos:webpack',
-  vite: 'logos:vitejs',
-  esbuild: 'logos:esbuild',
-}
-```
-
-### Custom Icons
-
-> You can add any icons from [iconify](https://icon-sets.iconify.design/) or local svg file.
-
-```ts
-// .vitepress/config.ts
-import { defineConfig } from 'vitepress'
-import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
-
-export default defineConfig({
-  markdown: {
-    config(md) {
-      md.use(groupIconMdPlugin)
-    },
-  },
-  vite: {
-    plugins: [
-      groupIconVitePlugin({
-        customIcon: {
-          ae: 'logos:adobe-after-effects',
-          ai: 'logos:adobe-illustrator',
-          ps: 'logos:adobe-photoshop',
-          rspack: localIconLoader(import.meta.url, '../assets/rspack.svg'),
-          farm: localIconLoader(import.meta.url, '../assets/farm.svg'),
-        },
-      })
-    ],
-  }
-})
-```
-
 ## License
 
 [MIT](./LICENSE) License © 2024-PRESENT [Leo](https://github.com/yuyinws)
