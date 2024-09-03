@@ -187,9 +187,6 @@ bun add vitepress-plugin-group-icons
 ``` [foo.ts]
 ```
 
-``` [bar.ts]
-```
-
 ``` [foo.js]
 ```
 

@@ -88,6 +88,10 @@ bun add vitepress-plugin-group-icons
 :::
 ````
 
+## Credits
+
+- [Nuxt UI Pro](https://ui.nuxt.com/pro/prose/code-group)
+
 ## License
 
 [MIT](./LICENSE) License © 2024-PRESENT [Leo](https://github.com/yuyinws)
