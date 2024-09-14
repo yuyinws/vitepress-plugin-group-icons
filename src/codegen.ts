@@ -62,7 +62,7 @@ function getMatchedLabels(labels: Set<string>, icons: Record<string, string>) {
   const matched: Record<string, string[]> = {}
 
   for (const label of labels) {
-    const key = Object.keys(icons).find(k => label?.toLowerCase().includes(k))
+    const key = Object.keys(icons).find(k => label?.toLocaleLowerCase() === k || label?.toLowerCase().includes(k))
     if (key) {
       matched[icons[key]] = (matched[icons[key]] || []).concat(label)
     }
