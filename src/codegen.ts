@@ -74,7 +74,7 @@ function getMatchedLabels(labels: Set<string>, icons: Record<string, string>) {
 async function generateIconCSS(matched: Record<string, string[]>) {
   const iconCSS = await Promise.all(Object.entries(matched).map(async ([icon, labels]) => {
     const svg = await getSVG(icon)
-    const selector = labels.map(label => `[data-title^='${label}']::before`).join(',')
+    const selector = labels.map(label => `[data-title='${label}']::before`).join(',')
     return `
 ${selector} {
   content: '';
