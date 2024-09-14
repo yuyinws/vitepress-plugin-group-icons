@@ -6,7 +6,7 @@
 [![JSDocs][jsdocs-src]][jsdocs-href]
 [![License][license-src]][license-href]
 
-> Automatically fill the missing product icon for code groups.
+> Enhance code blocks features for VitePress.
 
 ![vp-plugin-group-icons](https://static.yuy1n.io/vp-plugin-group-icons.png)
 
