@@ -9,7 +9,7 @@ export interface Options {
 export function groupIconVitePlugin(options?: Options): Plugin {
   const virtualCssId = 'virtual:group-icons.css'
   const resolvedVirtualCssId = `\0${virtualCssId}`
-  const combinedRegex = /<(?:label|span)[^>]+\bdata-title=\\"([^"]*)\\"|<(?:label|span)[^>]+\bdata-title="([^"]*)"/g
+  const combinedRegex = /\bdata-title=\\"([^"]*)\\"|\bdata-title="([^"]*)"|"data-title":\s*"([^"]*)"/g
   const matches = new Set<string>()
 
   let oldMatches: Set<string>
@@ -56,7 +56,8 @@ export function groupIconVitePlugin(options?: Options): Plugin {
         const match = combinedRegex.exec(code)
         if (!match)
           break
-        matches.add(match[1] || match[2])
+
+        matches.add(match[1] || match[2] || match[3])
       }
 
       if (!isSetEqual(matches, oldMatches)) {
