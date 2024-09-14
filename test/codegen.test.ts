@@ -11,11 +11,11 @@ describe('generate css', () => {
   })
 
   it('custom icon', async () => {
-    const labels = new Set(['farm', 'ae'])
+    const labels = new Set(['vitepress', 'ae'])
     expect(await generateCSS(labels, {
       customIcon: {
         ae: 'logos:adobe-after-effects',
-        farm: localIconLoader(import.meta.url, '../docs/assets/farm.svg'),
+        vitepress: localIconLoader(import.meta.url, '../docs/assets/vitepress.svg'),
       },
     })).toMatchSnapshot()
   })
