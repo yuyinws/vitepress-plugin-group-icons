@@ -4,7 +4,7 @@ layout: home
 
 ---
 
-```js [vite.config.js]
+```js [test.ts]
 import legacy from '@vitejs/plugin-legacy'
 import { defineConfig } from 'vite'
 
@@ -62,3 +62,7 @@ bun add vitepress-plugin-group-icons
 ```
 
 :::
+
+```ts{2,9-11} [server.ts] twoslash
+const foo: number = 1
+```

@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@iconify-json/devicon": "^1.1.50",
+    "@shikijs/vitepress-twoslash": "^1.17.6",
     "vite-plugin-inspect": "^0.8.5",
     "vitepress-plugin-group-icons": "workspace:*"
   }

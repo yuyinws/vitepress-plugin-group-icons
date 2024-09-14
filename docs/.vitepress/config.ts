@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
 import Inspect from 'vite-plugin-inspect'
+import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -28,7 +29,9 @@ export default defineConfig({
     config(md) {
       md.use(groupIconMdPlugin)
     },
-
+    codeTransformers: [
+      transformerTwoslash(),
+    ],
   },
   head: [
     ['meta', { property: 'og:title', content: 'Vitepress Plugin Group Icons' }],
