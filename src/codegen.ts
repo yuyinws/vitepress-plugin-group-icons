@@ -60,9 +60,9 @@ export async function generateCSS(labels: Set<string>, options: Options) {
 
 function getMatchedLabels(labels: Set<string>, icons: Record<string, string>) {
   const matched: Record<string, string[]> = {}
-
+  const sortedKeys = Object.keys(icons).sort((a, b) => b.length - a.length)
   for (const label of labels) {
-    const key = Object.keys(icons).find(k => label?.toLowerCase().includes(k))
+    const key = sortedKeys.find(k => label?.toLowerCase().includes(k))
     if (key) {
       matched[icons[key]] = (matched[icons[key]] || []).concat(label)
     }
