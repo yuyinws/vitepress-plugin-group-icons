@@ -50,7 +50,7 @@ export async function generateCSS(labels: Set<string>, options: Options) {
 }
 `
 
-  const mergedIcons = { ...builtinIcons, ...options.customIcon }
+  const mergedIcons = { ...options.customIcon, ...builtinIcons }
   const matched = getMatchedLabels(labels, mergedIcons)
 
   const css = baseCSS + await generateIconCSS(matched)
@@ -62,7 +62,7 @@ function getMatchedLabels(labels: Set<string>, icons: Record<string, string>) {
   const matched: Record<string, string[]> = {}
 
   for (const label of labels) {
-    const key = Object.keys(icons).find(k => label?.toLocaleLowerCase() === k || label?.toLowerCase().includes(k))
+    const key = Object.keys(icons).find(k => label?.toLowerCase().includes(k))
     if (key) {
       matched[icons[key]] = (matched[icons[key]] || []).concat(label)
     }
