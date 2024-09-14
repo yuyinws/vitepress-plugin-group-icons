@@ -206,6 +206,9 @@ export default defineConfig({
 ``` [foo.html]
 ```
 
+``` [foo.css]
+```
+
 ``` [foo.ico]
 ```
 

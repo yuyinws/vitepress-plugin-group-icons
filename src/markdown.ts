@@ -21,9 +21,21 @@ export function groupIconMdPlugin(md: Markdown) {
       const [tokens, idx] = args
       const token = tokens[idx]
 
+      let isOnCodeGroup = false
+      for (let i = idx - 1; i >= 0; i--) {
+        if (tokens[i].type === 'container_code-group_open') {
+          isOnCodeGroup = true
+          break
+        }
+
+        if (tokens[i].type === 'container_code-group_close') {
+          break
+        }
+      }
       const title = token.info.match(/\[(.*?)\]/)
 
-      if (token.level === 0 && token.tag === 'code' && title) {
+      // only render code block not in code-group
+      if (!isOnCodeGroup && title) {
         return `<div class="vp-code-block-title">
       <div class="vp-code-block-title-bar">
           <span class="vp-code-block-title-text" data-title="${md.utils.escapeHtml(title[1])}">${title[1]}</span>
