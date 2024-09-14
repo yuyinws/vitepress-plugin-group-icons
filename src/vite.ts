@@ -9,9 +9,10 @@ export interface Options {
 export function groupIconVitePlugin(options?: Options): Plugin {
   const virtualCssId = 'virtual:group-icons.css'
   const resolvedVirtualCssId = `\0${virtualCssId}`
-  const labelMatchs = new Set<string>()
-  let oldLabelMatchs: Set<string>
-  const labelMatchRegex = /<label[^>]+\bdata-title=\\"([^"]*)\\"|<label[^>]+\bdata-title="[^"]*"/g
+  const combinedRegex = /<(?:label|span)[^>]+\bdata-title=\\"([^"]*)\\"|<(?:label|span)[^>]+\bdata-title="([^"]*)"/g
+  const matches = new Set<string>()
+
+  let oldMatches: Set<string>
   let server: ViteDevServer | undefined
 
   options = options || { customIcon: {} }
@@ -40,8 +41,8 @@ export function groupIconVitePlugin(options?: Options): Plugin {
 
     async load(id) {
       if (id === resolvedVirtualCssId) {
-        const { css } = await generateCSS(labelMatchs, options)
-        oldLabelMatchs = new Set(labelMatchs)
+        const { css } = await generateCSS(matches, options)
+        oldMatches = new Set(matches)
         return css
       }
 
@@ -52,13 +53,13 @@ export function groupIconVitePlugin(options?: Options): Plugin {
         return
 
       while (true) {
-        const match = labelMatchRegex.exec(code)
+        const match = combinedRegex.exec(code)
         if (!match)
           break
-        labelMatchs.add(match[1])
+        matches.add(match[1] || match[2])
       }
 
-      if (!isSetEqual(labelMatchs, oldLabelMatchs)) {
+      if (!isSetEqual(matches, oldMatches)) {
         handleUpdateModule()
       }
     },

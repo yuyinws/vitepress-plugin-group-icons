@@ -6,6 +6,7 @@ import { builtinIcons } from './builtin'
 
 export async function generateCSS(labels: Set<string>, options: Options) {
   const baseCSS = `
+.vp-code-block-title [data-title]::before,
 .vp-code-group [data-title]::before {
   display: inline-block;
   width: 1em;
@@ -13,7 +14,41 @@ export async function generateCSS(labels: Set<string>, options: Options) {
   margin-right: 0.5em;
   margin-bottom: -0.2em;
   background: var(--icon) no-repeat center / contain;
-}`
+}
+
+.vp-code-block-title-bar {
+  position: relative;
+  margin: 16px -24px 0 -24px;
+  background-color: var(--vp-code-block-bg);
+  overflow-x: auto;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vp-code-tab-text-color);
+  white-space: nowrap;
+  transition: background-color 0.5s;
+  border-radius: 8px 8px 0 0;
+  padding:0 12px;
+  box-shadow: inset 0 -1px var(--vp-code-tab-divider);
+}
+
+@media (min-width: 640px) {
+  .vp-code-block-title-bar {
+    margin: 16px 0 0 0;
+  }
+}
+
+.vp-code-block-title-text {
+  padding: 0 12px;
+  line-height: 48px;
+}
+
+
+.vp-code-block-title div[class*=language-] {
+  margin-top: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+`
 
   const mergedIcons = { ...builtinIcons, ...options.customIcon }
   const matched = getMatchedLabels(labels, mergedIcons)
@@ -27,7 +62,7 @@ function getMatchedLabels(labels: Set<string>, icons: Record<string, string>) {
   const matched: Record<string, string[]> = {}
 
   for (const label of labels) {
-    const key = Object.keys(icons).find(k => label?.toLowerCase().includes(k))
+    const key = Object.keys(icons).find(k => label?.toLocaleLowerCase() === k || label?.toLowerCase().includes(k))
     if (key) {
       matched[icons[key]] = (matched[icons[key]] || []).concat(label)
     }

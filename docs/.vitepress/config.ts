@@ -10,6 +10,18 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/yuyinws/vitepress-plugin-group-icons' },
     ],
+    nav: [
+      { text: 'Features', link: '/features' },
+    ],
+    sidebar: [
+      {
+        text: 'Guide',
+        items: [
+          { text: 'Getting Started', link: '/getting-started' },
+          { text: 'Features', link: '/features' },
+        ],
+      },
+    ],
 
   },
   markdown: {
@@ -35,9 +47,7 @@ export default defineConfig({
         customIcon: {
           '.mdx': 'vscode-icons:file-type-light-mdx',
           'babel': 'vscode-icons:file-type-light-babel2',
-          '.go': 'vscode-icons:file-type-go',
-          'rspack': localIconLoader(import.meta.url, '../assets/rspack.svg'),
-          'farm': localIconLoader(import.meta.url, '../assets/farm.svg'),
+          'vitepress': localIconLoader(import.meta.url, '../assets/vitepress.svg'),
         },
       }),
       Inspect(),
