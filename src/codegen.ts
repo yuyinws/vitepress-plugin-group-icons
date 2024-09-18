@@ -1,6 +1,5 @@
 import { createRequire } from 'node:module'
-import { getIconData } from '@iconify/utils'
-import { encodeSvgForCss } from '@iconify/utils/lib/svg/encode-svg-for-css'
+import { encodeSvgForCss, getIconData, iconToHTML, iconToSVG } from '@iconify/utils'
 import type { Options } from './vite'
 import { builtinIcons } from './builtin'
 
@@ -96,8 +95,9 @@ async function getSVG(icon: string) {
     const iconData = getIconData(icons, iconName)
 
     if (iconData) {
-      const { top = 0, left = 0, width = 0, height = 0, body } = iconData
-      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${top} ${left} ${width} ${height}'>${body}</svg>`
+      const { attributes, body } = iconToSVG(iconData)
+      const svg = iconToHTML(body, attributes)
+
       return encodeSvgForCss(svg)
     }
 
