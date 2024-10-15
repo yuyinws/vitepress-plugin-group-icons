@@ -1,7 +1,7 @@
+import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
+import Inspect from 'vite-plugin-inspect'
 import { defineConfig } from 'vitepress'
 import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
-import Inspect from 'vite-plugin-inspect'
-import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -51,6 +51,7 @@ export default defineConfig({
           '.mdx': 'vscode-icons:file-type-light-mdx',
           'babel': 'vscode-icons:file-type-light-babel2',
           'vitepress': localIconLoader(import.meta.url, '../assets/vitepress.svg'),
+          'oxc': 'https://cdn.jsdelivr.net/gh/oxc-project/oxc-assets/round.svg',
         },
       }),
       Inspect(),

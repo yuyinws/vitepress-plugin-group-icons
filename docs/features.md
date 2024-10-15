@@ -259,4 +259,7 @@ export default defineConfig({
 ``` [Vitepress]
 ```
 
+``` [oxc]
+```
+
 :::
