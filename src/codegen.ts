@@ -1,6 +1,6 @@
+import type { Options } from './vite'
 import { createRequire } from 'node:module'
 import { encodeSvgForCss, getIconData, iconToHTML, iconToSVG } from '@iconify/utils'
-import type { Options } from './vite'
 import { builtinIcons } from './builtin'
 
 export async function generateCSS(labels: Set<string>, options: Options) {
@@ -87,6 +87,18 @@ ${selector} {
 async function getSVG(icon: string) {
   if (icon.startsWith('<svg')) {
     return encodeSvgForCss(icon)
+  }
+
+  if (/^https?:\/\//.test(icon)) {
+    try {
+      const raw = await fetch(icon)
+      const iconContent = await raw.text()
+      return encodeSvgForCss(iconContent)
+    }
+    catch {
+      console.warn(`[vitepress-plugin-group-icons]: Failed to fetch icon: ${icon}`)
+      return ''
+    }
   }
 
   const [collection, iconName] = icon.split(':')

@@ -9,7 +9,7 @@ export function groupIconMdPlugin(md: Markdown) {
       return codeGroupOpenRule(...args).replace(
         labelRE,
         (match: string, label: string) =>
-        `<label data-title="${md.utils.escapeHtml(label)}"${match.slice(6)}`,
+          `<label data-title="${md.utils.escapeHtml(label)}"${match.slice(6)}`,
       )
     }
   }
