@@ -4,7 +4,7 @@ export const builtinIcons = {
   'npm': 'vscode-icons:file-type-npm',
   'yarn': 'vscode-icons:file-type-yarn',
   'bun': 'vscode-icons:file-type-bun',
-  'deno': 'vscode-icons:file-type-light-deno',
+  'deno': 'vscode-icons:file-type-deno',
   // frameworks
   'vue': 'vscode-icons:file-type-vue',
   'svelte': 'vscode-icons:file-type-svelte',

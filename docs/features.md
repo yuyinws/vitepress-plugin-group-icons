@@ -121,6 +121,9 @@ export default defineConfig({
 ``` [bun]
 ```
 
+``` [deno]
+```
+
 :::
 
 ### Frameworks
