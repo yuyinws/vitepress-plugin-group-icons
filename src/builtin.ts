@@ -54,4 +54,5 @@ export const builtinIcons = {
   '.scss': 'vscode-icons:file-type-scss',
   '.yml': 'vscode-icons:file-type-light-yaml',
   '.yaml': 'vscode-icons:file-type-light-yaml',
+  '.php': 'vscode-icons:file-type-php',
 }
