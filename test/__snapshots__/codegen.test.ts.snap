@@ -418,3 +418,60 @@ exports[`generate css > empty icon 1`] = `
 ",
 }
 `;
+
+exports[`generate css > named icon 1`] = `
+{
+  "css": "
+.vp-code-block-title [data-title]::before,
+.vp-code-group [data-title]::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.5em;
+  margin-bottom: -0.2em;
+  background: var(--icon) no-repeat center / contain;
+}
+
+.vp-code-block-title-bar {
+  position: relative;
+  margin: 16px -24px 0 -24px;
+  background-color: var(--vp-code-block-bg);
+  overflow-x: auto;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vp-code-tab-text-color);
+  white-space: nowrap;
+  transition: background-color 0.5s;
+  border-radius: 8px 8px 0 0;
+  padding:0 12px;
+  box-shadow: inset 0 -1px var(--vp-code-tab-divider);
+}
+
+.custom-block .vp-code-block-title-bar {
+  margin: 16px 0 0 0;
+}
+
+@media (min-width: 640px) {
+  .vp-code-block-title-bar {
+    margin: 16px 0 0 0;
+  }
+}
+
+.vp-code-block-title-text {
+  padding: 0 12px;
+  line-height: 48px;
+}
+
+
+.vp-code-block-title div[class*=language-] {
+  margin-top: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
+[data-title='named-icon ~vscode-icons:default-folder~']::before {
+  content: '';
+  --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 32 32'%3E%3Cpath fill='%23c09553' d='M27.5 5.5h-9.3l-2.1 4.2H4.4v16.8h25.2v-21Zm0 4.2h-8.2l1.1-2.1h7.1Z'/%3E%3C/svg%3E");
+}",
+}
+`;

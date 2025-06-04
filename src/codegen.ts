@@ -2,6 +2,7 @@ import type { Options } from './vite'
 import { createRequire } from 'node:module'
 import { encodeSvgForCss, getIconData, iconToHTML, iconToSVG } from '@iconify/utils'
 import { builtinIcons } from './builtin'
+import { namedIconMatchRegex } from './utils'
 
 export async function generateCSS(labels: Set<string>, options: Options) {
   const baseCSS = `
@@ -71,9 +72,16 @@ function getMatchedLabels(labels: Set<string>, icons: Record<string, string>) {
   const matched: Record<string, string[]> = {}
   const sortedKeys = Object.keys(icons).sort((a, b) => b.length - a.length)
   for (const label of labels) {
-    const key = sortedKeys.find(k => label?.toLowerCase().includes(k))
-    if (key) {
-      matched[icons[key]] = (matched[icons[key]] || []).concat(label)
+    const namedIconMatch = label.match(namedIconMatchRegex)
+    if (namedIconMatch) {
+      const [_, namedIcon] = namedIconMatch
+      matched[namedIcon] = (matched[namedIcon] || []).concat(label)
+    }
+    else {
+      const key = sortedKeys.find(k => label?.toLowerCase().includes(k))
+      if (key) {
+        matched[icons[key]] = (matched[icons[key]] || []).concat(label)
+      }
     }
   }
 

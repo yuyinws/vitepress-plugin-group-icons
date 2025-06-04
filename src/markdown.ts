@@ -1,4 +1,5 @@
 import type Markdown from 'markdown-it'
+import { namedIconMatchRegex } from './utils'
 
 interface MdPluginOptions {
   titleBar: {
@@ -27,6 +28,18 @@ export function groupIconMdPlugin(md: Markdown, options?: MdPluginOptions) {
     }
   }
 
+  // replace named icon in label content
+  const namedIconLabelMatchRegex = /(<label[^>]*>)(.*?)(~[^~]+~)(.*?)(<\/label>)/g
+  md.renderer.rules['container_code-group_open']! = (...args) => {
+    const code = codeGroupOpenRule!(...args)
+    return code.replace(
+      namedIconLabelMatchRegex,
+      (_, labelStart, beforeIcon, _icon, afterIcon, labelEnd) => {
+        return `${labelStart}${beforeIcon.trim()}${afterIcon}${labelEnd}`
+      },
+    )
+  }
+
   // code block rule
   const fenceRule = md.renderer.rules.fence
   if (fenceRule) {
@@ -51,9 +64,10 @@ export function groupIconMdPlugin(md: Markdown, options?: MdPluginOptions) {
 
       // only render code block not in code-group
       if (!isOnCodeGroup && title && (!(token as any).src || isIncludedSnippet)) {
+        const namedIconMatch = title[1].match(namedIconMatchRegex)
         return `<div class="vp-code-block-title">
       <div class="vp-code-block-title-bar">
-          <span class="vp-code-block-title-text" data-title="${md.utils.escapeHtml(title[1])}">${title[1]}</span>
+          <span class="vp-code-block-title-text" data-title="${md.utils.escapeHtml(title[1])}">${namedIconMatch ? title[1].replace(namedIconMatch[0], '') : title[1]}</span>
       </div>
         ${fenceRule(...args)}
       </div>

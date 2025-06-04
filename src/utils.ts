@@ -14,3 +14,5 @@ export function isSetEqual(set1: Set<string>, set2: Set<string>) {
     return false
   }
 }
+
+export const namedIconMatchRegex = /\s~([^~]+)~/

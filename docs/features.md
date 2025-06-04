@@ -291,6 +291,22 @@ export default defineConfig({
 
 :::
 
+## Named Icons
+
+You can also use named icons by using the `~icon~` syntax.
+
+````md {1}
+``` [Docker ~vscode-icons:file-type-docker2~]
+Docker
+```
+````
+
+### Output
+
+``` [Docker ~vscode-icons:file-type-docker2~]
+Docker
+```
+
 ## Default Labels
 
 > Force specific icons to be loaded regardless of whether they appear in your documentation.

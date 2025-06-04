@@ -60,4 +60,11 @@ describe('generate css', () => {
       },
     })).toMatchSnapshot()
   })
+
+  it('named icon', async () => {
+    const labels = new Set(['named-icon ~vscode-icons:default-folder~'])
+    expect(await generateCSS(labels, {
+      customIcon: {},
+    })).toMatchSnapshot()
+  })
 })
