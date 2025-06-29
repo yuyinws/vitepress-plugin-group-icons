@@ -154,6 +154,9 @@ export default defineConfig({
 ``` [Nuxt]
 ```
 
+``` [Qwik]
+```
+
 :::
 
 ### Bundlers
