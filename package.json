@@ -54,7 +54,7 @@
   "dependencies": {
     "@iconify-json/logos": "^1.2.4",
     "@iconify-json/vscode-icons": "^1.2.23",
-    "@iconify/utils": "^2.3.0"
+    "@iconify/utils": "^3.0.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.16.1",
