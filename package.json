@@ -66,7 +66,7 @@
     "esno": "^4.8.0",
     "lint-staged": "^16.1.2",
     "simple-git-hooks": "^2.13.0",
-    "tsdown": "^0.12.9",
+    "tsdown": "^0.13.4",
     "typescript": "^5.8.3",
     "vite": "^7.0.0",
     "vitepress": "^1.6.3",
