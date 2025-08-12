@@ -15,6 +15,7 @@ export const builtinIcons = {
   'solid': 'logos:solidjs-icon',
   'astro': 'vscode-icons:file-type-light-astro',
   'qwik': 'logos:qwik-icon',
+  'ember': 'vscode-icons:file-type-ember',
   // bundlers
   'rollup': 'vscode-icons:file-type-rollup',
   'webpack': 'vscode-icons:file-type-webpack',
@@ -57,4 +58,6 @@ export const builtinIcons = {
   '.yml': 'vscode-icons:file-type-light-yaml',
   '.yaml': 'vscode-icons:file-type-light-yaml',
   '.php': 'vscode-icons:file-type-php',
+  '.gjs': 'vscode-icons:file-type-glimmer',
+  '.gts': 'vscode-icons:file-type-glimmer',
 }

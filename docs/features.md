@@ -157,6 +157,9 @@ export default defineConfig({
 ``` [Qwik]
 ```
 
+``` [Ember]
+```
+
 :::
 
 ### Bundlers
@@ -239,6 +242,9 @@ export default defineConfig({
 ```
 
 ``` [foo.ico]
+```
+
+``` [foo.gjs]
 ```
 
 :::
