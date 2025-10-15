@@ -58,7 +58,7 @@ export function groupIconMdPlugin(md: Markdown, options?: MdPluginOptions) {
           break
         }
       }
-      const title = token.info.match(/\[(.*?)\]/)
+      const title = token.info.match(/\[((?:[^[\]]|\[[^[\]]*\])*)\]/)
 
       const isIncludedSnippet = _options.titleBar.includeSnippet
 

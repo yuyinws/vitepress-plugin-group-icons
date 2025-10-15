@@ -17,3 +17,7 @@ Docker
 ```
 
 :::
+
+```ts [users/[id]/index.ts]
+// users/[id]/index.ts
+```
