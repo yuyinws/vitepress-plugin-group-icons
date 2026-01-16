@@ -5,4 +5,6 @@ packages:
   - examples/*
 
 onlyBuiltDependencies:
+  - esbuild
   - rolldown
+  - simple-git-hooks
