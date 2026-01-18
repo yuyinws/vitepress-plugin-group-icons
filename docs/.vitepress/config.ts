@@ -57,12 +57,15 @@ export default defineConfig({
     plugins: [
       groupIconVitePlugin({
         customIcon: {
-          '.mdx': 'vscode-icons:file-type-light-mdx',
+          '.mdx': {
+            light: 'vscode-icons:file-type-light-mdx',
+            dark: 'vscode-icons:file-type-mdx',
+          },
           'babel': 'vscode-icons:file-type-light-babel2',
           'vitepress': localIconLoader(import.meta.url, '../assets/vitepress.svg'),
           'unplugin': 'https://unplugin.unjs.io/logo_light.svg',
         },
-      }),
+      }) as any,
       Inspect(),
     ],
   },

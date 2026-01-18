@@ -1,16 +1,7 @@
 import type { Plugin, ViteDevServer } from 'vite'
-import { createFilter } from 'vite'
+import type { Options } from './types'
 import { generateCSS } from './codegen'
 import { isSetEqual } from './utils'
-
-export interface Options {
-  customIcon?: Record<string, string>
-  defaultLabels?: string[]
-}
-
-const filter = createFilter(
-  [/\.md$/, /\.md\?vue/, /\.md\?v=/],
-)
 
 export function groupIconVitePlugin(options?: Options): Plugin {
   const virtualCssId = 'virtual:group-icons.css'
@@ -54,21 +45,23 @@ export function groupIconVitePlugin(options?: Options): Plugin {
 
       return undefined
     },
-    transform(code, id) {
-      if (!filter(id))
-        return
+    transform: {
+      filter: {
+        id: /\.(md|md\?vue|md\?v=)$/,
+      },
+      handler(code) {
+        while (true) {
+          const match = combinedRegex.exec(code)
+          if (!match)
+            break
 
-      while (true) {
-        const match = combinedRegex.exec(code)
-        if (!match)
-          break
+          matches.add(match[1] || match[2] || match[3])
+        }
 
-        matches.add(match[1] || match[2] || match[3])
-      }
-
-      if (!isSetEqual(matches, oldMatches)) {
-        handleUpdateModule()
-      }
+        if (!isSetEqual(matches, oldMatches)) {
+          handleUpdateModule()
+        }
+      },
     },
   }
 }

@@ -1,6 +1,11 @@
-export const builtinIcons = {
+import type { Icon } from './types'
+
+export const builtinIcons: Icon = {
   // package managers
-  'pnpm': 'vscode-icons:file-type-light-pnpm',
+  'pnpm': {
+    dark: 'vscode-icons:file-type-pnpm',
+    light: 'vscode-icons:file-type-light-pnpm',
+  },
   'npm': 'vscode-icons:file-type-npm',
   'yarn': 'vscode-icons:file-type-yarn',
   'bun': 'vscode-icons:file-type-bun',
@@ -10,17 +15,33 @@ export const builtinIcons = {
   'svelte': 'vscode-icons:file-type-svelte',
   'angular': 'vscode-icons:file-type-angular',
   'react': 'vscode-icons:file-type-reactjs',
-  'next': 'vscode-icons:file-type-light-next',
+  'next': {
+    dark: 'vscode-icons:file-type-next',
+    light: 'vscode-icons:file-type-light-next',
+  },
   'nuxt': 'vscode-icons:file-type-nuxt',
-  'solid': 'logos:solidjs-icon',
-  'astro': 'vscode-icons:file-type-light-astro',
+  'astro': {
+    dark: 'vscode-icons:file-type-astro',
+    light: 'vscode-icons:file-type-light-astro',
+  },
   'qwik': 'logos:qwik-icon',
   'ember': 'vscode-icons:file-type-ember',
+  'vitest': {
+    dark: 'vscode-icons:file-type-vitest',
+    light: 'vscode-icons:file-type-light-vitest',
+  },
   // bundlers
   'rollup': 'vscode-icons:file-type-rollup',
   'webpack': 'vscode-icons:file-type-webpack',
-  'vite': 'vscode-icons:file-type-vite',
+  'vite': {
+    dark: 'vscode-icons:file-type-vite',
+    light: 'vscode-icons:file-type-light-vite',
+  },
   'esbuild': 'vscode-icons:file-type-esbuild',
+  'rolldown': {
+    dark: 'vscode-icons:file-type-rolldown',
+    light: 'vscode-icons:file-type-light-rolldown',
+  },
   // configuration files
   'package.json': 'vscode-icons:file-type-node',
   'tsconfig.json': 'vscode-icons:file-type-tsconfig',
@@ -37,7 +58,6 @@ export const builtinIcons = {
   'tailwind.config': 'vscode-icons:file-type-tailwind',
   'uno.config': 'vscode-icons:file-type-unocss',
   'unocss.config': 'vscode-icons:file-type-unocss',
-  '.oxlintrc': 'vscode-icons:file-type-oxlint',
   'vue.config': 'vscode-icons:file-type-vueconfig',
   // filename extensions
   '.mts': 'vscode-icons:file-type-typescript',
@@ -55,9 +75,28 @@ export const builtinIcons = {
   '.html': 'vscode-icons:file-type-html',
   '.css': 'vscode-icons:file-type-css',
   '.scss': 'vscode-icons:file-type-scss',
-  '.yml': 'vscode-icons:file-type-light-yaml',
-  '.yaml': 'vscode-icons:file-type-light-yaml',
+  '.yml': {
+    dark: 'vscode-icons:file-type-yaml',
+    light: 'vscode-icons:file-type-light-yaml',
+  },
+  '.yaml': {
+    dark: 'vscode-icons:file-type-yaml',
+    light: 'vscode-icons:file-type-light-yaml',
+  },
   '.php': 'vscode-icons:file-type-php',
   '.gjs': 'vscode-icons:file-type-glimmer',
   '.gts': 'vscode-icons:file-type-glimmer',
+  // misc
+  'oxlint': {
+    dark: 'vscode-icons:file-type-oxc',
+    light: 'vscode-icons:file-type-light-oxc',
+  },
+  'oxc': {
+    dark: 'vscode-icons:file-type-oxc',
+    light: 'vscode-icons:file-type-light-oxc',
+  },
+  'oxfmt': {
+    dark: 'vscode-icons:file-type-oxc',
+    light: 'vscode-icons:file-type-light-oxc',
+  },
 }

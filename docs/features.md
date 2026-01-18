@@ -1,6 +1,6 @@
 # Features
 
-## 💡 Fill Icons
+## 💡 Fill icons
 
 > Automatically fill the missing product icons for code groups.
 
@@ -50,7 +50,7 @@ bun add vitepress-plugin-group-icons
 
 :::
 
-## 🪧 Title Bar
+## 🪧 Title bar
 
 > Add a title bar with icon and name for code blocks.
 
@@ -103,7 +103,7 @@ export default defineConfig({
 })
 ```
 
-## Built-in Icons
+## Built-in icons
 
 ### Package Managers
 
@@ -255,7 +255,33 @@ export default defineConfig({
 
 :::
 
-## Custom Icons
+## Theme matched icons
+
+Automatic matching of icons with two themes (switch theme to view effects ):
+
+<script setup>
+import SwitchTheme from './.vitepress/theme/components/switch-theme.vue'
+</script>
+
+<SwitchTheme />
+
+::: code-group
+
+```sh [vite]
+```
+
+```sh [rolldown]
+```
+
+```sh [oxc]
+```
+
+```sh [vitest]
+```
+
+:::
+
+## Custom icons
 
 > You can add any icons from [iconify](https://icon-sets.iconify.design/), local svg file or url.
 
@@ -273,7 +299,10 @@ export default defineConfig({
     plugins: [
       groupIconVitePlugin({
         customIcon: {
-          '.mdx': 'vscode-icons:file-type-light-mdx',
+          '.mdx': {
+            light: 'vscode-icons:file-type-light-mdx',
+            dark: 'vscode-icons:file-type-mdx',
+          },
           'babel': 'vscode-icons:file-type-babel',
           'vitepress': localIconLoader(import.meta.url, '../assets/vitepress.svg'),
           'unplugin': 'https://unplugin.unjs.io/logo_light.svg',
@@ -300,7 +329,7 @@ export default defineConfig({
 
 :::
 
-## Named Icons
+## Named icons
 
 You can also use named icons by using the `~icon~` syntax.
 
@@ -316,7 +345,7 @@ Docker
 Docker
 ```
 
-## Default Labels
+## Default labels
 
 > Force specific icons to be loaded regardless of whether they appear in your documentation.
 

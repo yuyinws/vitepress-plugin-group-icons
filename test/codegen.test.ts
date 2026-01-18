@@ -10,6 +10,11 @@ describe('generate css', () => {
     })).toMatchSnapshot()
   })
 
+  it('themed icon (dark/light)', async () => {
+    const labels = new Set(['vite'])
+    expect(await generateCSS(labels, {})).toMatchSnapshot()
+  })
+
   it('custom icon', { timeout: 0 }, async () => {
     const labels = new Set(['vitepress', 'ae', 'oxc'])
     expect(await generateCSS(labels, {

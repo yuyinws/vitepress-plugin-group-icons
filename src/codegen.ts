@@ -1,4 +1,4 @@
-import type { Options } from './vite'
+import type { Icon, IconValue, Options } from './types'
 import { createRequire } from 'node:module'
 import { encodeSvgForCss, getIconData, iconToHTML, iconToSVG } from '@iconify/utils'
 import { builtinIcons } from './builtin'
@@ -54,7 +54,7 @@ export async function generateCSS(labels: Set<string>, options: Options) {
 }
 `
 
-  const mergedIcons = { ...builtinIcons, ...options.customIcon }
+  const mergedIcons: Icon = { ...builtinIcons, ...options.customIcon }
   const matched = getMatchedLabels(
     new Set([
       ...labels,
@@ -68,45 +68,101 @@ export async function generateCSS(labels: Set<string>, options: Options) {
   return { css }
 }
 
-function getMatchedLabels(labels: Set<string>, icons: Record<string, string>) {
-  const matched: Record<string, string[]> = {}
+interface MatchedIcon {
+  icon: IconValue
+  labels: string[]
+}
+
+function iconKey(icon: IconValue) {
+  return typeof icon === 'string' ? `s:${icon}` : `o:${JSON.stringify(icon)}`
+}
+
+function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[] {
+  const matched = new Map<string, MatchedIcon>()
   const sortedKeys = Object.keys(icons).sort((a, b) => b.length - a.length)
+
+  const add = (icon: IconValue, label: string) => {
+    const key = iconKey(icon)
+    const current = matched.get(key)
+    if (current) {
+      current.labels.push(label)
+    }
+    else {
+      matched.set(key, { icon, labels: [label] })
+    }
+  }
+
   for (const label of labels) {
     const namedIconMatch = label.match(namedIconMatchRegex)
     if (namedIconMatch) {
       const [_, namedIcon] = namedIconMatch
-      matched[namedIcon] = (matched[namedIcon] || []).concat(label)
+      add(namedIcon, label)
     }
     else {
       const key = sortedKeys.find(k => label?.toLowerCase().includes(k))
       if (key) {
-        matched[icons[key]] = (matched[icons[key]] || []).concat(label)
+        add(icons[key], label)
       }
     }
   }
 
-  return matched
+  return Array.from(matched.values())
 }
 
-async function generateIconCSS(matched: Record<string, string[]>) {
-  const iconCSS = await Promise.all(Object.entries(matched).map(async ([icon, labels]) => {
-    if (!icon) {
-      return ''
-    }
+function prefixSelectors(prefix: string, selectors: string[]) {
+  return selectors.map(s => `${prefix} ${s}`).join(',')
+}
 
-    const svg = await getSVG(icon)
-    const selector = labels.map(label => `[data-title='${label}']::before`).join(',')
-    return `
+async function generateIconCSS(matched: MatchedIcon[]) {
+  const iconCSS = await Promise.all(matched.map(async ({ icon, labels }) => {
+    const selectors = labels.map(label => `[data-title='${label}']::before`)
+
+    if (typeof icon === 'string') {
+      if (!icon) {
+        return ''
+      }
+
+      const svg = await getSVG(icon)
+      const selector = selectors.join(',')
+      return `
 ${selector} {
   content: '';
   --icon: url("data:image/svg+xml,${svg}");
 }`
+    }
+
+    const output: string[] = []
+
+    if (icon.light) {
+      const svg = await getSVG(icon.light)
+      const selector = prefixSelectors('', selectors)
+      output.push(`
+${selector} {
+  content: '';
+  --icon: url("data:image/svg+xml,${svg}");
+}`)
+    }
+
+    if (icon.dark) {
+      const svg = await getSVG(icon.dark)
+      const selector = prefixSelectors('html.dark', selectors)
+      output.push(`
+${selector} {
+  content: '';
+  --icon: url("data:image/svg+xml,${svg}");
+}`)
+    }
+
+    return output.join('')
   }))
 
   return iconCSS.sort().join('')
 }
 
 async function getSVG(icon: string) {
+  if (!icon) {
+    return ''
+  }
   if (icon.startsWith('<svg')) {
     return encodeSvgForCss(icon)
   }
