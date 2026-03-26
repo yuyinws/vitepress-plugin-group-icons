@@ -33,8 +33,8 @@
     }
   },
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
+    "build": "tsdown --deps.neverBundle markdown-it",
+    "dev": "pnpm build --watch",
     "lint:fix": "vp lint --fix && vp fmt",
     "lint": "vp lint",
     "release": "bumpp",
