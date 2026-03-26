@@ -1,24 +1,20 @@
 {
   "name": "vitepress-plugin-group-icons",
-  "type": "module",
   "version": "1.7.2",
-  "packageManager": "pnpm@10.33.0",
-  "author": "Leo <https://github.com/yuyinws>",
-  "license": "MIT",
+  "keywords": [],
   "homepage": "https://github.com/yuyinws/vitepress-plugin-group-icons#readme",
+  "bugs": "https://github.com/yuyinws/vitepress-plugin-group-icons/issues",
+  "license": "MIT",
+  "author": "Leo <https://github.com/yuyinws>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yuyinws/vitepress-plugin-group-icons.git"
   },
-  "bugs": "https://github.com/yuyinws/vitepress-plugin-group-icons/issues",
-  "keywords": [],
+  "files": [
+    "dist"
+  ],
+  "type": "module",
   "sideEffects": false,
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.mts",
-      "import": "./dist/index.mjs"
-    }
-  },
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
@@ -30,21 +26,43 @@
       ]
     }
   },
-  "files": [
-    "dist"
-  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "lint": "eslint .",
+    "lint:fix": "vp lint --fix && vp fmt",
+    "lint": "vp lint",
     "release": "bumpp",
-    "test": "vitest",
+    "test": "vp test",
     "prepublishOnly": "pnpm build",
     "typecheck": "tsc --noEmit",
     "prepare": "simple-git-hooks",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
+  },
+  "dependencies": {
+    "@iconify-json/logos": "^1.2.10",
+    "@iconify-json/vscode-icons": "^1.2.45",
+    "@iconify/utils": "^3.1.0"
+  },
+  "devDependencies": {
+    "@antfu/ni": "^30.0.0",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^25.5.0",
+    "bumpp": "^11.0.1",
+    "lint-staged": "^16.4.0",
+    "simple-git-hooks": "^2.13.1",
+    "tsdown": "^0.21.5",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.2",
+    "vite-plus": "^0.1.14",
+    "vitepress": "^1.6.4"
   },
   "peerDependencies": {
     "vite": ">=3"
@@ -54,31 +72,5 @@
       "optional": true
     }
   },
-  "dependencies": {
-    "@iconify-json/logos": "^1.2.10",
-    "@iconify-json/vscode-icons": "^1.2.45",
-    "@iconify/utils": "^3.1.0"
-  },
-  "devDependencies": {
-    "@antfu/eslint-config": "^7.7.3",
-    "@antfu/ni": "^30.0.0",
-    "@types/markdown-it": "^14.1.2",
-    "@types/node": "^25.5.0",
-    "bumpp": "^11.0.1",
-    "eslint": "^10.1.0",
-    "esno": "^4.8.0",
-    "lint-staged": "^16.4.0",
-    "simple-git-hooks": "^2.13.1",
-    "tsdown": "^0.21.5",
-    "typescript": "^6.0.2",
-    "vite": "^8.0.2",
-    "vitepress": "^1.6.4",
-    "vitest": "^4.1.1"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged"
-  },
-  "lint-staged": {
-    "*": "eslint --fix"
-  }
+  "packageManager": "pnpm@10.33.0"
 }

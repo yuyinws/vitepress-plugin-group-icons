@@ -58,14 +58,11 @@ export async function generateCSS(labels: Set<string>, options: Options) {
 
   const mergedIcons: Icon = { ...builtinIcons, ...options.customIcon }
   const matched = getMatchedLabels(
-    new Set([
-      ...labels,
-      ...(options.defaultLabels || []),
-    ]),
+    new Set([...labels, ...(options.defaultLabels || [])]),
     mergedIcons,
   )
 
-  const css = baseCSS + await generateIconCSS(matched)
+  const css = baseCSS + (await generateIconCSS(matched))
 
   return { css }
 }
@@ -88,8 +85,7 @@ function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[] {
     const current = matched.get(key)
     if (current) {
       current.labels.push(label)
-    }
-    else {
+    } else {
       matched.set(key, { icon, labels: [label] })
     }
   }
@@ -99,8 +95,7 @@ function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[] {
     if (namedIconMatch) {
       const [_, namedIcon] = namedIconMatch
       add(namedIcon, label)
-    }
-    else {
+    } else {
       const key = sortedKeys.find(k => label?.toLowerCase().includes(k))
       if (key) {
         add(icons[key], label)
@@ -116,47 +111,49 @@ function prefixSelectors(prefix: string, selectors: string[]) {
 }
 
 async function generateIconCSS(matched: MatchedIcon[]) {
-  const iconCSS = await Promise.all(matched.map(async ({ icon, labels }) => {
-    const selectors = labels.map(label => `[data-title='${label}']::before`)
+  const iconCSS = await Promise.all(
+    matched.map(async ({ icon, labels }) => {
+      const selectors = labels.map(label => `[data-title='${label}']::before`)
 
-    if (typeof icon === 'string') {
-      if (!icon) {
-        return ''
-      }
+      if (typeof icon === 'string') {
+        if (!icon) {
+          return ''
+        }
 
-      const svg = await getSVG(icon)
-      const selector = selectors.join(',')
-      return `
+        const svg = await getSVG(icon)
+        const selector = selectors.join(',')
+        return `
 ${selector} {
   content: '';
   --icon: url("data:image/svg+xml,${svg}");
 }`
-    }
+      }
 
-    const output: string[] = []
+      const output: string[] = []
 
-    if (icon.light) {
-      const svg = await getSVG(icon.light)
-      const selector = prefixSelectors('', selectors)
-      output.push(`
+      if (icon.light) {
+        const svg = await getSVG(icon.light)
+        const selector = prefixSelectors('', selectors)
+        output.push(`
 ${selector} {
   content: '';
   --icon: url("data:image/svg+xml,${svg}");
 }`)
-    }
+      }
 
-    if (icon.dark) {
-      const svg = await getSVG(icon.dark)
-      const selector = prefixSelectors('html.dark', selectors)
-      output.push(`
+      if (icon.dark) {
+        const svg = await getSVG(icon.dark)
+        const selector = prefixSelectors('html.dark', selectors)
+        output.push(`
 ${selector} {
   content: '';
   --icon: url("data:image/svg+xml,${svg}");
 }`)
-    }
+      }
 
-    return output.join('')
-  }))
+      return output.join('')
+    }),
+  )
 
   return iconCSS.sort().join('')
 }
@@ -174,8 +171,7 @@ async function getSVG(icon: string) {
       const raw = await fetch(icon)
       const iconContent = await raw.text()
       return encodeSvgForCss(iconContent)
-    }
-    catch {
+    } catch {
       console.warn(`[vitepress-plugin-group-icons]: Failed to fetch icon: ${icon}`)
       return ''
     }
@@ -194,9 +190,10 @@ async function getSVG(icon: string) {
     }
 
     return ''
-  }
-  catch {
-    console.warn(`[vitepress-plugin-group-icons]: Icon set \`${collection}\` not found. Please install \`@iconify-json/${collection}\` first`)
+  } catch {
+    console.warn(
+      `[vitepress-plugin-group-icons]: Icon set \`${collection}\` not found. Please install \`@iconify-json/${collection}\` first`,
+    )
     return ''
   }
 }

@@ -1,7 +1,11 @@
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 import Inspect from 'vite-plugin-inspect'
 import { defineConfig } from 'vitepress'
-import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
+import {
+  groupIconMdPlugin,
+  groupIconVitePlugin,
+  localIconLoader,
+} from 'vitepress-plugin-group-icons'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -28,7 +32,6 @@ export default defineConfig({
         link: '/showcase',
       },
     ],
-
   },
   markdown: {
     config(md) {
@@ -38,13 +41,17 @@ export default defineConfig({
         },
       })
     },
-    codeTransformers: [
-      transformerTwoslash(),
-    ],
+    codeTransformers: [transformerTwoslash()],
   },
   head: [
     ['meta', { property: 'og:title', content: 'Vitepress Plugin Group Icons' }],
-    ['meta', { property: 'og:description', content: 'Automatically fill the missing product icon for code groups.' }],
+    [
+      'meta',
+      {
+        property: 'og:description',
+        content: 'Automatically fill the missing product icon for code groups.',
+      },
+    ],
     ['meta', { property: 'og:image', content: `https://vpgi.vercel.app//og.png` }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:url', content: 'https://vpgi.vercel.app/' }],

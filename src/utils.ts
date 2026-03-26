@@ -9,8 +9,7 @@ export function isSetEqual(set1: Set<string>, set2: Set<string>) {
       }
     }
     return true
-  }
-  catch {
+  } catch {
     return false
   }
 }
