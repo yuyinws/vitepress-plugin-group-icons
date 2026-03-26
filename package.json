@@ -40,7 +40,6 @@
     "release": "bumpp",
     "test": "vp test",
     "prepublishOnly": "pnpm build",
-    "typecheck": "tsc --noEmit",
     "prepare": "simple-git-hooks",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
@@ -62,7 +61,8 @@
     "typescript": "^6.0.2",
     "vite": "^8.0.2",
     "vite-plus": "^0.1.14",
-    "vitepress": "^1.6.4"
+    "vitepress": "^1.6.4",
+    "vitest": "^4.1.1"
   },
   "peerDependencies": {
     "vite": ">=3"
