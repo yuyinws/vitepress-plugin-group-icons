@@ -34,7 +34,7 @@ export function groupIconVitePlugin(options?: Options): Plugin {
     const mod = server?.moduleGraph.getModuleById(resolvedVirtualCssId)
     if (mod) {
       server!.moduleGraph.invalidateModule(mod)
-      server!.reloadModule(mod)
+      void server!.reloadModule(mod)
     }
   }
 

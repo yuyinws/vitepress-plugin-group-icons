@@ -6,6 +6,9 @@ export default defineConfig({
   },
   lint: {
     plugins: ['eslint', 'typescript'],
+    options: {
+      typeAware: true,
+    },
   },
   fmt: {
     ignorePatterns: ['dist/**', '*.md'],
