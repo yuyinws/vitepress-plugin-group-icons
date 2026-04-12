@@ -83,6 +83,8 @@ export function getMatchedLabels(
   extensionIcons: Icon,
 ): MatchedIcon[] {
   const matched = new Map<string, MatchedIcon>()
+  const sortedNamedKeys = Object.keys(namedIcons).sort((a, b) => b.length - a.length)
+  const sortedExtensionKeys = Object.keys(extensionIcons).sort((a, b) => b.length - a.length)
 
   const add = (icon: IconValue, label: string) => {
     const key = iconKey(icon)
@@ -100,13 +102,11 @@ export function getMatchedLabels(
       const [_, namedIcon] = namedIconMatch
       add(namedIcon, label)
     } else {
-      const sortedNamedKeys = Object.keys(namedIcons).sort((a, b) => b.length - a.length)
       const namedKey = sortedNamedKeys.find(k => label?.toLowerCase().includes(k))
 
       if (namedKey) {
         add(namedIcons[namedKey], label)
       } else {
-        const sortedExtensionKeys = Object.keys(extensionIcons).sort((a, b) => b.length - a.length)
         const extensionKey = sortedExtensionKeys.find(k => label?.toLowerCase().endsWith(k))
         if (extensionKey) {
           add(extensionIcons[extensionKey], label)

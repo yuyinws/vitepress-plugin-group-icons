@@ -47,13 +47,7 @@ export const builtinNamedIcons: Icon = {
   // configuration files
   'package.json': 'vscode-icons:file-type-node',
   'tsconfig.json': 'vscode-icons:file-type-tsconfig',
-  '.npmrc': 'vscode-icons:file-type-npm',
-  '.editorconfig': 'vscode-icons:file-type-editorconfig',
-  '.eslintrc': 'vscode-icons:file-type-eslint',
-  '.eslintignore': 'vscode-icons:file-type-eslint',
   'eslint.config': 'vscode-icons:file-type-eslint',
-  '.gitignore': 'vscode-icons:file-type-git',
-  '.gitattributes': 'vscode-icons:file-type-git',
   '.env': 'vscode-icons:file-type-dotenv',
   '.env.example': 'vscode-icons:file-type-dotenv',
   '.vscode': 'vscode-icons:file-type-vscode',
@@ -89,6 +83,13 @@ export const builtinNamedIcons: Icon = {
 }
 
 export const builtinExtensionIcons: Icon = {
+  // configuration files
+  '.npmrc': 'vscode-icons:file-type-npm',
+  '.editorconfig': 'vscode-icons:file-type-editorconfig',
+  '.eslintrc': 'vscode-icons:file-type-eslint',
+  '.eslintignore': 'vscode-icons:file-type-eslint',
+  '.gitignore': 'vscode-icons:file-type-git',
+  '.gitattributes': 'vscode-icons:file-type-git',
   // filename extensions
   '.mts': 'vscode-icons:file-type-typescript',
   '.cts': 'vscode-icons:file-type-typescript',
