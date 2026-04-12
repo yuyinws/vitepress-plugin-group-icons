@@ -211,6 +211,12 @@ export default defineConfig({
 ``` [.oxlintrc.json]
 ```
 
+``` [prisma.config.ts]
+```
+
+``` [build.gradle]
+```
+
 :::
 
 ### Filename Extension
@@ -229,7 +235,25 @@ export default defineConfig({
 ``` [foo.py]
 ```
 
+``` [foo.rs]
+```
+
+``` [foo.go]
+```
+
+``` [foo.java]
+```
+
+``` [foo.cpp]
+```
+
+``` [foo.dart]
+```
+
 ``` [foo.yml]
+```
+
+``` [foo.toml]
 ```
 
 ``` [foo.html]
@@ -241,10 +265,19 @@ export default defineConfig({
 ``` [foo.scss]
 ```
 
+``` [foo.less]
+```
+
 ``` [foo.ico]
 ```
 
 ``` [foo.gjs]
+```
+
+``` [foo.wasm]
+```
+
+``` [foo.jsp]
 ```
 
 :::

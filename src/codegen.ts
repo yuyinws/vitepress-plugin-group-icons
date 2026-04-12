@@ -56,10 +56,11 @@ export async function generateCSS(labels: Set<string>, options: Options) {
 }
 `
 
-  const mergedIcons: Icon = { ...builtinIcons, ...options.customIcon }
+  const mergedNamedIcons: Icon = { ...builtinIcons.builtinNamedIcons, ...options.customIcon }
   const matched = getMatchedLabels(
     new Set([...labels, ...(options.defaultLabels || [])]),
-    mergedIcons,
+    mergedNamedIcons,
+    builtinIcons.builtinExtensionIcons,
   )
 
   const css = baseCSS + (await generateIconCSS(matched))
@@ -76,9 +77,12 @@ function iconKey(icon: IconValue) {
   return typeof icon === 'string' ? `s:${icon}` : `o:${JSON.stringify(icon)}`
 }
 
-function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[] {
+export function getMatchedLabels(
+  labels: Set<string>,
+  namedIcons: Icon,
+  extensionIcons: Icon,
+): MatchedIcon[] {
   const matched = new Map<string, MatchedIcon>()
-  const sortedKeys = Object.keys(icons).sort((a, b) => b.length - a.length)
 
   const add = (icon: IconValue, label: string) => {
     const key = iconKey(icon)
@@ -96,9 +100,17 @@ function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[] {
       const [_, namedIcon] = namedIconMatch
       add(namedIcon, label)
     } else {
-      const key = sortedKeys.find(k => label?.toLowerCase().includes(k))
-      if (key) {
-        add(icons[key], label)
+      const sortedNamedKeys = Object.keys(namedIcons).sort((a, b) => b.length - a.length)
+      const namedKey = sortedNamedKeys.find(k => label?.toLowerCase().includes(k))
+
+      if (namedKey) {
+        add(namedIcons[namedKey], label)
+      } else {
+        const sortedExtensionKeys = Object.keys(extensionIcons).sort((a, b) => b.length - a.length)
+        const extensionKey = sortedExtensionKeys.find(k => label?.toLowerCase().endsWith(k))
+        if (extensionKey) {
+          add(extensionIcons[extensionKey], label)
+        }
       }
     }
   }

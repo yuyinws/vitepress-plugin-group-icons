@@ -1,6 +1,6 @@
 import type { Icon } from './types'
 
-export const builtinIcons: Icon = {
+export const builtinNamedIcons: Icon = {
   // package managers
   'pnpm': {
     dark: 'vscode-icons:file-type-pnpm',
@@ -61,6 +61,34 @@ export const builtinIcons: Icon = {
   'uno.config': 'vscode-icons:file-type-unocss',
   'unocss.config': 'vscode-icons:file-type-unocss',
   'vue.config': 'vscode-icons:file-type-vueconfig',
+  'prisma.config': {
+    dark: 'vscode-icons:file-type-prisma',
+    light: 'vscode-icons:file-type-light-prisma',
+  },
+  'build.gradle': {
+    dark: 'vscode-icons:file-type-gradle',
+    light: 'vscode-icons:file-type-light-gradle',
+  },
+  'settings.gradle': {
+    dark: 'vscode-icons:file-type-gradle',
+    light: 'vscode-icons:file-type-light-gradle',
+  },
+  // misc
+  'oxlint': {
+    dark: 'vscode-icons:file-type-oxc',
+    light: 'vscode-icons:file-type-light-oxc',
+  },
+  'oxc': {
+    dark: 'vscode-icons:file-type-oxc',
+    light: 'vscode-icons:file-type-light-oxc',
+  },
+  'oxfmt': {
+    dark: 'vscode-icons:file-type-oxc',
+    light: 'vscode-icons:file-type-light-oxc',
+  },
+}
+
+export const builtinExtensionIcons: Icon = {
   // filename extensions
   '.mts': 'vscode-icons:file-type-typescript',
   '.cts': 'vscode-icons:file-type-typescript',
@@ -77,6 +105,12 @@ export const builtinIcons: Icon = {
   '.html': 'vscode-icons:file-type-html',
   '.css': 'vscode-icons:file-type-css',
   '.scss': 'vscode-icons:file-type-scss',
+  '.sass': 'vscode-icons:file-type-sass',
+  '.less': 'vscode-icons:file-type-less',
+  '.prisma': {
+    dark: 'vscode-icons:file-type-prisma',
+    light: 'vscode-icons:file-type-light-prisma',
+  },
   '.yml': {
     dark: 'vscode-icons:file-type-yaml',
     light: 'vscode-icons:file-type-light-yaml',
@@ -85,20 +119,45 @@ export const builtinIcons: Icon = {
     dark: 'vscode-icons:file-type-yaml',
     light: 'vscode-icons:file-type-light-yaml',
   },
+  '.toml': {
+    dark: 'vscode-icons:file-type-toml',
+    light: 'vscode-icons:file-type-light-toml',
+  },
+  '.ini': {
+    dark: 'vscode-icons:file-type-ini',
+    light: 'vscode-icons:file-type-light-ini',
+  },
   '.php': 'vscode-icons:file-type-php',
   '.gjs': 'vscode-icons:file-type-glimmer',
   '.gts': 'vscode-icons:file-type-glimmer',
-  // misc
-  'oxlint': {
-    dark: 'vscode-icons:file-type-oxc',
-    light: 'vscode-icons:file-type-light-oxc',
+  '.jsp': 'vscode-icons:file-type-jsp',
+  '.wasm': 'vscode-icons:file-type-wasm',
+  '.rs': {
+    dark: 'vscode-icons:file-type-rust',
+    light: 'vscode-icons:file-type-light-rust',
   },
-  'oxc': {
-    dark: 'vscode-icons:file-type-oxc',
-    light: 'vscode-icons:file-type-light-oxc',
-  },
-  'oxfmt': {
-    dark: 'vscode-icons:file-type-oxc',
-    light: 'vscode-icons:file-type-light-oxc',
-  },
+  '.go': 'vscode-icons:file-type-go',
+  '.java': 'vscode-icons:file-type-java',
+  '.c': 'vscode-icons:file-type-c',
+  '.cpp': 'vscode-icons:file-type-cpp',
+  '.cs': 'vscode-icons:file-type-csharp',
+  '.dart': 'vscode-icons:file-type-dartlang',
+  '.sln': 'vscode-icons:file-type-sln',
+  '.kt': 'vscode-icons:file-type-kotlin',
+  '.groovy': 'vscode-icons:file-type-groovy',
+  '.scala': 'vscode-icons:file-type-scala',
+  '.swift': 'vscode-icons:file-type-swift',
+  '.lua': 'vscode-icons:file-type-lua',
+  '.r': 'vscode-icons:file-type-r',
+  '.rb': 'vscode-icons:file-type-ruby',
+}
+
+export interface IconType {
+  builtinNamedIcons: Icon
+  builtinExtensionIcons: Icon
+}
+
+export const builtinIcons: IconType = {
+  builtinNamedIcons,
+  builtinExtensionIcons,
 }
