@@ -105,13 +105,12 @@ export function getMatchedLabels(
   }
 
   for (const label of labels) {
-    const iconMatch = label.match(namedIconMatchRegex)
-    if (iconMatch) {
-      const [_, namedIcon] = iconMatch
+    const namedIconMatch = label.match(namedIconMatchRegex)
+    if (namedIconMatch) {
+      const [_, namedIcon] = namedIconMatch
       add(namedIcon, label)
     } else {
       const key = sortedKeys.find(k => label?.toLowerCase().includes(k))
-
       if (key) {
         add(icons[key], label)
       } else if (extensionIcons) {
