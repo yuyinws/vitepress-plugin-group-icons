@@ -95,11 +95,26 @@ export const builtinExtensionIcons: Icon = {
   '.cts': 'vscode-icons:file-type-typescript',
   '.ts': 'vscode-icons:file-type-typescript',
   '.tsx': 'vscode-icons:file-type-typescript',
-  '.mjs': 'vscode-icons:file-type-js',
-  '.cjs': 'vscode-icons:file-type-js',
-  '.json': 'vscode-icons:file-type-json',
-  '.js': 'vscode-icons:file-type-js',
-  '.jsx': 'vscode-icons:file-type-js',
+  '.mjs': {
+    dark: 'vscode-icons:file-type-js',
+    light: 'vscode-icons:file-type-light-js',
+  },
+  '.cjs': {
+    dark: 'vscode-icons:file-type-js',
+    light: 'vscode-icons:file-type-light-js',
+  },
+  '.json': {
+    dark: 'vscode-icons:file-type-json',
+    light: 'vscode-icons:file-type-light-json',
+  },
+  '.js': {
+    dark: 'vscode-icons:file-type-js',
+    light: 'vscode-icons:file-type-light-js',
+  },
+  '.jsx': {
+    dark: 'vscode-icons:file-type-js',
+    light: 'vscode-icons:file-type-light-js',
+  },
   '.md': 'vscode-icons:file-type-markdown',
   '.py': 'vscode-icons:file-type-python',
   '.ico': 'vscode-icons:file-type-favicon',
@@ -113,12 +128,12 @@ export const builtinExtensionIcons: Icon = {
     light: 'vscode-icons:file-type-light-prisma',
   },
   '.yml': {
-    dark: 'vscode-icons:file-type-yaml',
-    light: 'vscode-icons:file-type-light-yaml',
+    dark: 'vscode-icons:file-type-yaml-official',
+    light: 'vscode-icons:file-type-light-yaml-official',
   },
   '.yaml': {
-    dark: 'vscode-icons:file-type-yaml',
-    light: 'vscode-icons:file-type-light-yaml',
+    dark: 'vscode-icons:file-type-yaml-official',
+    light: 'vscode-icons:file-type-light-yaml-official',
   },
   '.toml': {
     dark: 'vscode-icons:file-type-toml',
@@ -128,7 +143,7 @@ export const builtinExtensionIcons: Icon = {
     dark: 'vscode-icons:file-type-ini',
     light: 'vscode-icons:file-type-light-ini',
   },
-  '.php': 'vscode-icons:file-type-php',
+  '.php': 'vscode-icons:file-type-php3',
   '.gjs': 'vscode-icons:file-type-glimmer',
   '.gts': 'vscode-icons:file-type-glimmer',
   '.jsp': 'vscode-icons:file-type-jsp',
