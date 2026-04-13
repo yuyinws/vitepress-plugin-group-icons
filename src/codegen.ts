@@ -57,10 +57,14 @@ export async function generateCSS(labels: Set<string>, options: Options) {
 `
 
   const mergedNamedIcons: Icon = { ...builtinIcons.builtinNamedIcons, ...options.customIcon }
+  const mergedExtensionIcons: Icon = {
+    ...builtinIcons.builtinExtensionIcons,
+    ...options.customIcon,
+  }
   const matched = getMatchedLabels(
     new Set([...labels, ...(options.defaultLabels || [])]),
     mergedNamedIcons,
-    builtinIcons.builtinExtensionIcons,
+    mergedExtensionIcons,
   )
 
   const css = baseCSS + (await generateIconCSS(matched))
