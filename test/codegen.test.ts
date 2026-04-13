@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { builtinIcons, localIconLoader } from '../src'
+import { builtinExtensionIcons, builtinIcons, localIconLoader } from '../src'
 import { generateCSS, getMatchedLabels } from '../src/codegen'
 
 describe('generate css', () => {
@@ -62,10 +62,7 @@ describe('generate css', () => {
 
   it('default labels with all builtin icons', async () => {
     const labels = new Set([])
-    const allBuiltinKeys = [
-      ...Object.keys(builtinIcons.builtinNamedIcons),
-      ...Object.keys(builtinIcons.builtinExtensionIcons),
-    ]
+    const allBuiltinKeys = [...Object.keys(builtinIcons), ...Object.keys(builtinExtensionIcons)]
     expect(
       await generateCSS(labels, {
         defaultLabels: allBuiltinKeys.slice(0, 3),
@@ -99,28 +96,19 @@ describe('generate css', () => {
       'test.css',
       'test.c456789',
       'file.ts',
-      'file.tsx.bak',
       'script.py',
-      'python.py.backup',
       '.vscode/123456',
       'vite.config.ts',
     ])
 
-    const matched = getMatchedLabels(
-      labels,
-      builtinIcons.builtinNamedIcons,
-      builtinIcons.builtinExtensionIcons,
-    )
-
+    const matched = getMatchedLabels(labels, builtinIcons, builtinExtensionIcons)
     const matchedLabels = matched.flatMap(m => m.labels)
 
     expect(matchedLabels).toContain('test.c')
     expect(matchedLabels).toContain('test.css')
     expect(matchedLabels).not.toContain('test.c456789')
     expect(matchedLabels).toContain('file.ts')
-    expect(matchedLabels).not.toContain('file.tsx.bak')
     expect(matchedLabels).toContain('script.py')
-    expect(matchedLabels).not.toContain('python.py.backup')
     expect(matchedLabels).toContain('.vscode/123456')
 
     const cMatch = matched.find(m => m.labels.includes('test.c'))

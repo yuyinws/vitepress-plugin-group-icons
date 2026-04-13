@@ -211,12 +211,6 @@ export default defineConfig({
 ``` [.oxlintrc.json]
 ```
 
-``` [prisma.config.ts]
-```
-
-``` [build.gradle]
-```
-
 :::
 
 ### Filename Extension
@@ -235,25 +229,7 @@ export default defineConfig({
 ``` [foo.py]
 ```
 
-``` [foo.rs]
-```
-
-``` [foo.go]
-```
-
-``` [foo.java]
-```
-
-``` [foo.cpp]
-```
-
-``` [foo.dart]
-```
-
 ``` [foo.yml]
-```
-
-``` [foo.toml]
 ```
 
 ``` [foo.html]
@@ -265,19 +241,10 @@ export default defineConfig({
 ``` [foo.scss]
 ```
 
-``` [foo.less]
-```
-
 ``` [foo.ico]
 ```
 
 ``` [foo.gjs]
-```
-
-``` [foo.wasm]
-```
-
-``` [foo.jsp]
 ```
 
 :::
@@ -361,6 +328,78 @@ export default defineConfig({
 ```
 
 :::
+
+## Extension icons
+
+> You can add file extension icons by using the `enableExtensionIcons` option in VitePress config.
+
+```ts {2,13-14} [.vitepress/config.ts]
+import { defineConfig } from 'vitepress'
+import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
+
+export default defineConfig({
+  markdown: {
+    config(md) {
+      md.use(groupIconMdPlugin)
+    },
+  },
+  vite: {
+    plugins: [
+      groupIconVitePlugin({
+        enableExtensionIcons: true,
+        customExtensionIcon: { /* ... */ }
+      })
+    ],
+  }
+})
+```
+
+Extension icons include icons for languages such as C, C++, C#, Rust, Java, Go, Kotlin, Swift, Scala, Groovy, VS solution, R, Ruby, Dart by default.
+
+::: code-group
+
+``` [foo.c]
+```
+
+``` [foo.cpp]
+```
+
+``` [foo.cs]
+```
+
+``` [foo.rs]
+```
+
+``` [foo.java]
+```
+
+``` [foo.go]
+```
+
+``` [foo.kt]
+```
+
+``` [foo.swift]
+```
+
+``` [foo.scala]
+```
+
+``` [foo.groovy]
+```
+
+``` [foo.sln]
+```
+
+``` [foo.r]
+```
+
+``` [foo.rb]
+```
+
+:::
+
+You can also customize other matching rules in `customExtensionIcon`. Rules in `customExtensionIcon` will only match file extensions.
 
 ## Named icons
 

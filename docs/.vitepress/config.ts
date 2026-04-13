@@ -72,6 +72,7 @@ export default defineConfig({
           'vitepress': localIconLoader(import.meta.url, '../assets/vitepress.svg'),
           'unplugin': 'https://unplugin.unjs.io/logo_light.svg',
         },
+        enableExtensionIcons: true,
       }) as any,
       Inspect(),
     ],

@@ -1,6 +1,6 @@
 import type { Icon } from './types'
 
-export const builtinNamedIcons: Icon = {
+export const builtinIcons: Icon = {
   // package managers
   'pnpm': {
     dark: 'vscode-icons:file-type-pnpm',
@@ -47,7 +47,13 @@ export const builtinNamedIcons: Icon = {
   // configuration files
   'package.json': 'vscode-icons:file-type-node',
   'tsconfig.json': 'vscode-icons:file-type-tsconfig',
+  '.npmrc': 'vscode-icons:file-type-npm',
+  '.editorconfig': 'vscode-icons:file-type-editorconfig',
+  '.eslintrc': 'vscode-icons:file-type-eslint',
+  '.eslintignore': 'vscode-icons:file-type-eslint',
   'eslint.config': 'vscode-icons:file-type-eslint',
+  '.gitignore': 'vscode-icons:file-type-git',
+  '.gitattributes': 'vscode-icons:file-type-git',
   '.env': 'vscode-icons:file-type-dotenv',
   '.env.example': 'vscode-icons:file-type-dotenv',
   '.vscode': 'vscode-icons:file-type-vscode',
@@ -67,29 +73,6 @@ export const builtinNamedIcons: Icon = {
     dark: 'vscode-icons:file-type-gradle',
     light: 'vscode-icons:file-type-light-gradle',
   },
-  // misc
-  'oxlint': {
-    dark: 'vscode-icons:file-type-oxc',
-    light: 'vscode-icons:file-type-light-oxc',
-  },
-  'oxc': {
-    dark: 'vscode-icons:file-type-oxc',
-    light: 'vscode-icons:file-type-light-oxc',
-  },
-  'oxfmt': {
-    dark: 'vscode-icons:file-type-oxc',
-    light: 'vscode-icons:file-type-light-oxc',
-  },
-}
-
-export const builtinExtensionIcons: Icon = {
-  // configuration files
-  '.npmrc': 'vscode-icons:file-type-npm',
-  '.editorconfig': 'vscode-icons:file-type-editorconfig',
-  '.eslintrc': 'vscode-icons:file-type-eslint',
-  '.eslintignore': 'vscode-icons:file-type-eslint',
-  '.gitignore': 'vscode-icons:file-type-git',
-  '.gitattributes': 'vscode-icons:file-type-git',
   // filename extensions
   '.mts': 'vscode-icons:file-type-typescript',
   '.cts': 'vscode-icons:file-type-typescript',
@@ -121,12 +104,6 @@ export const builtinExtensionIcons: Icon = {
   '.html': 'vscode-icons:file-type-html',
   '.css': 'vscode-icons:file-type-css',
   '.scss': 'vscode-icons:file-type-scss',
-  '.sass': 'vscode-icons:file-type-sass',
-  '.less': 'vscode-icons:file-type-less',
-  '.prisma': {
-    dark: 'vscode-icons:file-type-prisma',
-    light: 'vscode-icons:file-type-light-prisma',
-  },
   '.yml': {
     dark: 'vscode-icons:file-type-yaml-official',
     light: 'vscode-icons:file-type-light-yaml-official',
@@ -134,6 +111,31 @@ export const builtinExtensionIcons: Icon = {
   '.yaml': {
     dark: 'vscode-icons:file-type-yaml-official',
     light: 'vscode-icons:file-type-light-yaml-official',
+  },
+  '.php': 'vscode-icons:file-type-php3',
+  '.gjs': 'vscode-icons:file-type-glimmer',
+  '.gts': 'vscode-icons:file-type-glimmer',
+  // misc
+  'oxlint': {
+    dark: 'vscode-icons:file-type-oxc',
+    light: 'vscode-icons:file-type-light-oxc',
+  },
+  'oxc': {
+    dark: 'vscode-icons:file-type-oxc',
+    light: 'vscode-icons:file-type-light-oxc',
+  },
+  'oxfmt': {
+    dark: 'vscode-icons:file-type-oxc',
+    light: 'vscode-icons:file-type-light-oxc',
+  },
+}
+
+export const builtinExtensionIcons: Icon = {
+  '.sass': 'vscode-icons:file-type-sass',
+  '.less': 'vscode-icons:file-type-less',
+  '.prisma': {
+    dark: 'vscode-icons:file-type-prisma',
+    light: 'vscode-icons:file-type-light-prisma',
   },
   '.toml': {
     dark: 'vscode-icons:file-type-toml',
@@ -143,9 +145,6 @@ export const builtinExtensionIcons: Icon = {
     dark: 'vscode-icons:file-type-ini',
     light: 'vscode-icons:file-type-light-ini',
   },
-  '.php': 'vscode-icons:file-type-php3',
-  '.gjs': 'vscode-icons:file-type-glimmer',
-  '.gts': 'vscode-icons:file-type-glimmer',
   '.jsp': 'vscode-icons:file-type-jsp',
   '.wasm': 'vscode-icons:file-type-wasm',
   '.rs': {
@@ -166,14 +165,4 @@ export const builtinExtensionIcons: Icon = {
   '.lua': 'vscode-icons:file-type-lua',
   '.r': 'vscode-icons:file-type-r',
   '.rb': 'vscode-icons:file-type-ruby',
-}
-
-export interface IconType {
-  builtinNamedIcons: Icon
-  builtinExtensionIcons: Icon
-}
-
-export const builtinIcons: IconType = {
-  builtinNamedIcons,
-  builtinExtensionIcons,
 }

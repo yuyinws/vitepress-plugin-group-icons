@@ -1,7 +1,7 @@
 import type { Icon, IconValue, Options } from './types'
 import { createRequire } from 'node:module'
 import { encodeSvgForCss, getIconData, iconToHTML, iconToSVG } from '@iconify/utils'
-import { builtinIcons } from './builtin'
+import { builtinExtensionIcons, builtinIcons } from './builtin'
 import { namedIconMatchRegex } from './utils'
 
 const HTTP_URL_RE = /^https?:\/\//
@@ -56,14 +56,16 @@ export async function generateCSS(labels: Set<string>, options: Options) {
 }
 `
 
-  const mergedNamedIcons: Icon = { ...builtinIcons.builtinNamedIcons, ...options.customIcon }
-  const mergedExtensionIcons: Icon = {
-    ...builtinIcons.builtinExtensionIcons,
-    ...options.customIcon,
-  }
+  const mergedIcons: Icon = { ...builtinIcons, ...options.customIcon }
+  const mergedExtensionIcons: Icon | undefined = options.enableExtensionIcons
+    ? {
+        ...builtinExtensionIcons,
+        ...options.customExtensionIcon,
+      }
+    : undefined
   const matched = getMatchedLabels(
     new Set([...labels, ...(options.defaultLabels || [])]),
-    mergedNamedIcons,
+    mergedIcons,
     mergedExtensionIcons,
   )
 
@@ -83,12 +85,14 @@ function iconKey(icon: IconValue) {
 
 export function getMatchedLabels(
   labels: Set<string>,
-  namedIcons: Icon,
-  extensionIcons: Icon,
+  icons: Icon,
+  extensionIcons: Icon | undefined,
 ): MatchedIcon[] {
   const matched = new Map<string, MatchedIcon>()
-  const sortedNamedKeys = Object.keys(namedIcons).sort((a, b) => b.length - a.length)
-  const sortedExtensionKeys = Object.keys(extensionIcons).sort((a, b) => b.length - a.length)
+  const sortedKeys = Object.keys(icons).sort((a, b) => b.length - a.length)
+  const sortedExtensionKeys = extensionIcons
+    ? Object.keys(extensionIcons).sort((a, b) => b.length - a.length)
+    : []
 
   const add = (icon: IconValue, label: string) => {
     const key = iconKey(icon)
@@ -101,16 +105,16 @@ export function getMatchedLabels(
   }
 
   for (const label of labels) {
-    const namedIconMatch = label.match(namedIconMatchRegex)
-    if (namedIconMatch) {
-      const [_, namedIcon] = namedIconMatch
+    const iconMatch = label.match(namedIconMatchRegex)
+    if (iconMatch) {
+      const [_, namedIcon] = iconMatch
       add(namedIcon, label)
     } else {
-      const namedKey = sortedNamedKeys.find(k => label?.toLowerCase().includes(k))
+      const key = sortedKeys.find(k => label?.toLowerCase().includes(k))
 
-      if (namedKey) {
-        add(namedIcons[namedKey], label)
-      } else {
+      if (key) {
+        add(icons[key], label)
+      } else if (extensionIcons) {
         const extensionKey = sortedExtensionKeys.find(k => label?.toLowerCase().endsWith(k))
         if (extensionKey) {
           add(extensionIcons[extensionKey], label)

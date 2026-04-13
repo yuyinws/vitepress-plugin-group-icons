@@ -28,7 +28,7 @@ export function groupIconVitePlugin(options?: Options): Plugin {
   let oldMatches = new Set<string>()
   let server: ViteDevServer | undefined
 
-  options = options || { customIcon: {} }
+  options = options || { customIcon: {}, enableExtensionIcons: false, customExtensionIcon: {} }
 
   function handleUpdateModule() {
     const mod = server?.moduleGraph.getModuleById(resolvedVirtualCssId)
