@@ -1,0 +1,4 @@
+interface:
+  display_name: "VitePress Group Icons"
+  short_description: "Add icons to VitePress code groups and title bars"
+  default_prompt: "Use $vitepress-plugin-group-icons to integrate code group icons into this VitePress site."

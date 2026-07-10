@@ -12,6 +12,10 @@ hero:
       link: /getting-started
 
     - theme: alt
+      text: Agent Skills
+      link: /skills
+
+    - theme: alt
       text: GitHub
       link: https://github.com/yuyinws/vitepress-plugin-group-icons
   image:
