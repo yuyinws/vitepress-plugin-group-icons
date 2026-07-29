@@ -98,7 +98,7 @@ export function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[
   for (const label of labels) {
     const namedIconMatch = label.match(namedIconMatchRegex)
     if (namedIconMatch) {
-      const [_, namedIcon] = namedIconMatch
+      const namedIcon = namedIconMatch[2]
       add(namedIcon, label)
     } else {
       const lowerCaseLabel = label.toLowerCase()

@@ -12,7 +12,7 @@ test
 Docker
 ```
 
-``` [Docker2 ~vscode-icons:file-type-docker2~]
+``` [Docker2 ~~vscode-icons:file-type-docker2~~]
 Docker
 ```
 

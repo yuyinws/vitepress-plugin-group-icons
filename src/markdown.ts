@@ -2,7 +2,7 @@ import type Markdown from 'markdown-it'
 import { namedIconMatchRegex } from './utils'
 
 const LABEL_RE = /<label\b(?![^>]+\bdata-title\b)[^>]*>(.*?)<\/label>/g
-const NAMED_ICON_LABEL_RE = /(<label[^>]*>)(.*?)(~[^~]+~)(.*?)(<\/label>)/g
+const NAMED_ICON_LABEL_RE = /(<label[^>]*>)(.*?)(<\/label>)/g
 const TITLE_RE = /\[((?:[^[\]]|\[[^[\]]*\])*)\]/
 
 interface MdPluginOptions {
@@ -34,12 +34,10 @@ export function groupIconMdPlugin(md: Markdown, options?: MdPluginOptions) {
   // replace named icon in label content
   md.renderer.rules['container_code-group_open']! = (...args) => {
     const code = codeGroupOpenRule!(...args)
-    return code.replace(
-      NAMED_ICON_LABEL_RE,
-      (_, labelStart, beforeIcon, _icon, afterIcon, labelEnd) => {
-        return `${labelStart}${beforeIcon.trim()}${afterIcon}${labelEnd}`
-      },
-    )
+    return code.replace(NAMED_ICON_LABEL_RE, (_, labelStart, label, labelEnd) => {
+      const namedIconMatch = label.match(namedIconMatchRegex)
+      return `${labelStart}${namedIconMatch ? label.replace(namedIconMatch[0], '') : label}${labelEnd}`
+    })
   }
 
   // code block rule

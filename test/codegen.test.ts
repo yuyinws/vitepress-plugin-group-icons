@@ -81,7 +81,10 @@ describe('generate css', () => {
   })
 
   it('named icon', async () => {
-    const labels = new Set(['named-icon ~vscode-icons:default-folder~'])
+    const labels = new Set([
+      'named-icon ~vscode-icons:default-folder~',
+      'named-icon ~~logos:adobe-after-effects~~',
+    ])
     expect(
       await generateCSS(labels, {
         customIcon: {},
