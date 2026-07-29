@@ -48,18 +48,18 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
-    "@iconify-json/logos": "^1.2.10",
-    "@iconify-json/vscode-icons": "^1.2.45",
-    "@iconify/utils": "^3.1.0"
+    "@iconify-json/logos": "^1.2.11",
+    "@iconify-json/vscode-icons": "^1.2.67",
+    "@iconify/utils": "^3.1.4"
   },
   "devDependencies": {
-    "@antfu/ni": "^30.0.0",
+    "@antfu/ni": "^30.3.0",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^25.5.0",
-    "bumpp": "^11.0.1",
-    "typescript": "^6.0.2",
-    "vite": "^8.0.2",
-    "vite-plus": "^0.1.14",
+    "@types/node": "^26.1.2",
+    "bumpp": "^12.1.1",
+    "typescript": "6.0.2",
+    "vite": "^8.1.5",
+    "vite-plus": "^0.2.6",
     "vitepress": "^1.6.4"
   },
   "peerDependencies": {
@@ -70,5 +70,5 @@
       "optional": true
     }
   },
-  "packageManager": "pnpm@10.33.0"
+  "packageManager": "pnpm@11.17.0"
 }

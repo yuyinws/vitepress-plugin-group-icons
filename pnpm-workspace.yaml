@@ -5,7 +5,8 @@ trustPolicy: no-downgrade
 packages:
   - docs
 
-onlyBuiltDependencies:
-  - esbuild
-  - rolldown
-  - simple-git-hooks
+minimumReleaseAgeExclude:
+  - bumpp@12.1.1
+
+allowBuilds:
+  esbuild: true
