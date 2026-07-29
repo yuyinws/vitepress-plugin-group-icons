@@ -53,7 +53,6 @@
     "@iconify/utils": "^3.1.4"
   },
   "devDependencies": {
-    "@antfu/ni": "^30.3.0",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^26.1.2",
     "bumpp": "^12.1.1",

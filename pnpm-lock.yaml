@@ -18,9 +18,6 @@ importers:
         specifier: ^3.1.4
         version: 3.1.4
     devDependencies:
-      '@antfu/ni':
-        specifier: ^30.3.0
-        version: 30.3.0
       '@types/markdown-it':
         specifier: ^14.1.2
         version: 14.1.2
@@ -138,11 +135,6 @@ packages:
 
   '@antfu/install-pkg@1.1.0':
     resolution: {integrity: sha512-MGQsmw10ZyI+EJo45CdSER4zEb+p31LpDAFp2Z3gkSd1yqVZGi0Ebx++YTEMonJy4oChEMLsxZ64j8FH6sSqtQ==}
-
-  '@antfu/ni@30.3.0':
-    resolution: {integrity: sha512-KkYFVPA1IvC3m+WBKUuY5oxYc4OdXr83jvnlOn8a+bJM10yQMu+slFN/1pDzAw2JZVi+FYP9IYjo4KaPIccMmA==}
-    engines: {node: '>=20.19.0'}
-    hasBin: true
 
   '@antfu/utils@0.7.10':
     resolution: {integrity: sha512-+562v9k4aI80m1+VuMHehNJWLOFjBnXn3tdOitzD0il5b7smkSBal4+a3oKiQTbrwMmN/TBUMDvbdoWDehgOww==}
@@ -1911,9 +1903,6 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  fzf@0.5.2:
-    resolution: {integrity: sha512-Tt4kuxLXFKHy8KT40zwsUPUkg1CrsgY25FxA2U/j/0WgEDCk3ddc/zLTCCcbSHX9FcKtLuVaDGtGE/STWC+j3Q==}
-
   get-tsconfig@4.13.7:
     resolution: {integrity: sha512-7tN6rFgBlMgpBML5j8typ92BKFi2sFQvIdpAqLA2beia5avZDrMs0FLZiM5etShWq5irVyGcGMEA1jcDaK7A/Q==}
 
@@ -2867,13 +2856,6 @@ snapshots:
     dependencies:
       package-manager-detector: 1.6.0
       tinyexec: 1.0.4
-
-  '@antfu/ni@30.3.0':
-    dependencies:
-      fzf: 0.5.2
-      package-manager-detector: 1.8.0
-      tinyexec: 1.2.4
-      tinyglobby: 0.2.17
 
   '@antfu/utils@0.7.10': {}
 
@@ -4206,8 +4188,6 @@ snapshots:
 
   fsevents@2.3.3:
     optional: true
-
-  fzf@0.5.2: {}
 
   get-tsconfig@4.13.7:
     dependencies:
