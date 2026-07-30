@@ -12,13 +12,13 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@7
+      - uses: actions/checkout@v7
 
       - name: Install pnpm
-        uses: pnpm/action-setup@6
+        uses: pnpm/action-setup@v6
 
       - name: Set node
-        uses: actions/setup-node@7
+        uses: actions/setup-node@v7
         with:
           node-version: lts/*
 
@@ -46,13 +46,13 @@ jobs:
           - macos-latest
       fail-fast: false
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/checkout@v7
 
       - name: Install pnpm
-        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
+        uses: pnpm/action-setup@v6
 
       - name: ${{ format('Set node {0}', matrix.node) }}
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
 
