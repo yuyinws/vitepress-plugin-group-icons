@@ -69,7 +69,6 @@ const keywordMatchIcons = {
     editorconfig: 'vscode-icons:file-type-editorconfig',
     gitignore: 'vscode-icons:file-type-git',
     gitattributes: 'vscode-icons:file-type-git',
-    env: 'vscode-icons:file-type-dotenv',
     vscode: 'vscode-icons:file-type-vscode',
     prisma: {
       dark: 'vscode-icons:file-type-prisma',
@@ -158,6 +157,7 @@ const extensionMatchIcons = {
   '.php': 'vscode-icons:file-type-php3',
   '.gjs': 'vscode-icons:file-type-glimmer',
   '.gts': 'vscode-icons:file-type-glimmer',
+  '.env': 'vscode-icons:file-type-dotenv',
 } satisfies Icon
 
 export const builtinIcons: Icon = {
