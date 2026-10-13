@@ -10,3 +10,15 @@ minimumReleaseAgeExclude:
 
 allowBuilds:
   esbuild: true
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@1.1.0
+  vite-plus: 1.1.0
+overrides:
+  vite@*: 'catalog:'
+  # VitePress 1 needs Rollup to emit the lean page chunks used by its client.
+  vitepress@1>vite: 5.4.19
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: '*'
