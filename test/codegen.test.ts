@@ -147,6 +147,27 @@ describe('generate css', () => {
     expect(iconOf('test.c456789')).toBeUndefined()
   })
 
+  it('prefers custom extensions over builtin ones', () => {
+    const labels = new Set([
+      '.vitepress/config.ts',
+      '.gitlab-ci.yml',
+      'docker-compose.yml (prod)',
+      'foo.ts',
+    ])
+    const matched = getMatchedLabels(labels, builtinIcons, {
+      '.vitepress': 'logos:vitejs',
+      '.gitlab-ci': 'vscode-icons:file-type-gitlab',
+      'docker-compose.yml': 'vscode-icons:file-type-docker2',
+    })
+
+    expect(matched).toEqual([
+      { icon: 'logos:vitejs', labels: ['.vitepress/config.ts'] },
+      { icon: 'vscode-icons:file-type-gitlab', labels: ['.gitlab-ci.yml'] },
+      { icon: 'vscode-icons:file-type-docker2', labels: ['docker-compose.yml (prod)'] },
+      { icon: 'vscode-icons:file-type-typescript', labels: ['foo.ts'] },
+    ])
+  })
+
   it('matches custom keywords case-insensitively', () => {
     const matched = getMatchedLabels(new Set(['docker-compose.yml', 'C++']), {
       'Docker': 'vscode-icons:file-type-docker2',

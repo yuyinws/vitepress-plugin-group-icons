@@ -82,13 +82,10 @@ export async function generateCSS(labels: Set<string>, options: Options) {
 }
 `
 
-  const mergedIcons: Icon = {
-    ...builtinIcons,
-    ...options.customIcon,
-  }
   const matched = getMatchedLabels(
     new Set([...labels, ...(options.defaultLabels || [])]),
-    mergedIcons,
+    builtinIcons,
+    options.customIcon,
   )
 
   const css = baseCSS + (await generateIconCSS(matched))
@@ -105,18 +102,31 @@ function iconKey(icon: IconValue) {
   return typeof icon === 'string' ? `s:${icon}` : `o:${JSON.stringify(icon)}`
 }
 
-export function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[] {
-  const matched = new Map<string, MatchedIcon>()
-  const sortedEntries = Object.entries(icons).sort(([a], [b]) => b.length - a.length)
-  const keywordEntries = sortedEntries
-    .filter(([label]) => !label.includes('.'))
-    .map(([keyword, icon]) => [createKeywordRE(keyword), icon] as const)
-  const extensionEntries = sortedEntries
+function getSortedEntries(icons: Icon) {
+  return Object.entries(icons).sort(([a], [b]) => b.length - a.length)
+}
+
+function getExtensionEntries(icons: Icon) {
+  return getSortedEntries(icons)
     .filter(([label]) => label.includes('.'))
     .map(
       ([extension, icon]) =>
         [extension.toLowerCase(), createExtensionSegmentRE(extension), icon] as const,
     )
+}
+
+export function getMatchedLabels(
+  labels: Set<string>,
+  icons: Icon,
+  customIcons: Icon = {},
+): MatchedIcon[] {
+  const matched = new Map<string, MatchedIcon>()
+  const keywordEntries = getSortedEntries({ ...icons, ...customIcons })
+    .filter(([label]) => !label.includes('.'))
+    .map(([keyword, icon]) => [createKeywordRE(keyword), icon] as const)
+  // Custom extensions are tried before builtin ones, so a custom `.vitepress` matches
+  // `.vitepress/config.ts` before the builtin `.ts` does.
+  const extensionGroups = [getExtensionEntries(customIcons), getExtensionEntries(icons)]
 
   const add = (icon: IconValue, label: string) => {
     const key = iconKey(icon)
@@ -145,9 +155,13 @@ export function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[
         continue
       }
 
-      const extensionMatch =
-        extensionEntries.find(([extension]) => lowerCaseLabel.endsWith(extension)) ??
-        extensionEntries.find(([, segmentRE]) => segmentRE.test(label))
+      let extensionMatch
+      for (const extensionEntries of extensionGroups) {
+        extensionMatch =
+          extensionEntries.find(([extension]) => lowerCaseLabel.endsWith(extension)) ??
+          extensionEntries.find(([, segmentRE]) => segmentRE.test(label))
+        if (extensionMatch) break
+      }
 
       if (extensionMatch) {
         add(extensionMatch[2], label)
