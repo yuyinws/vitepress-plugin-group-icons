@@ -1,7 +1,6 @@
 import type { Plugin, ViteDevServer } from 'vite'
 import type { Options } from './types'
 import { generateCSS } from './codegen'
-import { isSetEqual } from './utils'
 
 const HTML_ENTITY_LT_RE = /&(?:lt|#60);/g
 const HTML_ENTITY_GT_RE = /&(?:gt|#62);/g
@@ -10,6 +9,7 @@ const HTML_ENTITY_APOS_RE = /&(?:apos|#39);/g
 const HTML_ENTITY_AMP_RE = /&(?:amp|#38);/g
 const DATA_TITLE_RE = /\bdata-title=\\"([^"]*)\\"|\bdata-title="([^"]*)"|"data-title":\s*"([^"]*)"/g
 const MARKDOWN_ID_RE = /\.(md|md\?vue|md\?v=)$/
+const UPDATE_DELAY = 100
 
 // Titles are captured from JS string literals in the compiled module, so `\\` and friends are still escaped.
 function decodeJsString(value: string) {
@@ -34,18 +34,35 @@ export function groupIconVitePlugin(options?: Options): Plugin {
   const resolvedVirtualCssId = `\0${virtualCssId}`
   const matches = new Set<string>()
 
-  let oldMatches = new Set<string>()
+  // number of labels in the last generated CSS; `matches` only grows
+  let generatedCount = 0
+  let updateTimer: ReturnType<typeof setTimeout> | undefined
   let server: ViteDevServer | undefined
   let root: string | undefined
 
   options = options || { customIcon: {} }
 
-  function handleUpdateModule() {
-    const mod = server?.moduleGraph.getModuleById(resolvedVirtualCssId)
-    if (mod) {
-      server!.moduleGraph.invalidateModule(mod)
-      void server!.reloadModule(mod)
+  // Debounced so the burst of markdown transforms on startup reloads the CSS once
+  function scheduleUpdate() {
+    if (!server || updateTimer) {
+      return
     }
+
+    updateTimer = setTimeout(() => {
+      updateTimer = undefined
+      const mod = server?.moduleGraph.getModuleById(resolvedVirtualCssId)
+      if (!server || !mod || matches.size === generatedCount) {
+        return
+      }
+
+      server.moduleGraph.invalidateModule(mod)
+      server.reloadModule(mod).catch((error: unknown) => {
+        server?.config.logger.error(
+          `[vitepress-plugin-group-icons]: Failed to reload icon CSS: ${String(error)}`,
+        )
+      })
+    }, UPDATE_DELAY)
+    updateTimer.unref?.()
   }
 
   return {
@@ -68,8 +85,9 @@ export function groupIconVitePlugin(options?: Options): Plugin {
 
     async load(id) {
       if (id === resolvedVirtualCssId) {
+        const count = matches.size
         const { css } = await generateCSS(matches, options, root)
-        oldMatches = new Set(matches)
+        generatedCount = count
         return css
       }
 
@@ -92,8 +110,8 @@ export function groupIconVitePlugin(options?: Options): Plugin {
           }
         }
 
-        if (!isSetEqual(matches, oldMatches)) {
-          handleUpdateModule()
+        if (matches.size !== generatedCount) {
+          scheduleUpdate()
         }
       },
     },
