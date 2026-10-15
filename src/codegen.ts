@@ -5,6 +5,8 @@ import { builtinIcons } from './builtin'
 import { namedIconMatchRegex } from './utils'
 
 const HTTP_URL_RE = /^https?:\/\//
+const SVG_TAG_RE = /<svg[\s>]/i
+const FETCH_TIMEOUT = 10_000
 const CSS_STRING_SPECIAL_CHARS_RE = /['\\\n\r\f]/g
 const REGEXP_SPECIAL_CHARS_RE = /[.*+?^${}()|[\]\\]/g
 const CAMEL_CASE_BOUNDARY_RE = /([a-z0-9])([A-Z])/g
@@ -176,48 +178,32 @@ function prefixSelectors(prefix: string, selectors: string[]) {
   return selectors.map(s => `${prefix} ${s}`).join(',')
 }
 
+function iconRule(selector: string, svg: string) {
+  // skip icons that failed to load instead of leaving an empty box before the label
+  if (!svg) {
+    return ''
+  }
+
+  return `
+${selector} {
+  content: '';
+  --icon: url("data:image/svg+xml,${svg}");
+}`
+}
+
 async function generateIconCSS(matched: MatchedIcon[]) {
   const iconCSS = await Promise.all(
     matched.map(async ({ icon, labels }) => {
       const selectors = labels.map(label => `[data-title='${escapeCSSString(label)}']::before`)
 
       if (typeof icon === 'string') {
-        if (!icon) {
-          return ''
-        }
-
-        const svg = await getSVG(icon)
-        const selector = selectors.join(',')
-        return `
-${selector} {
-  content: '';
-  --icon: url("data:image/svg+xml,${svg}");
-}`
+        return iconRule(selectors.join(','), await getSVG(icon))
       }
 
-      const output: string[] = []
-
-      if (icon.light) {
-        const svg = await getSVG(icon.light)
-        const selector = prefixSelectors('', selectors)
-        output.push(`
-${selector} {
-  content: '';
-  --icon: url("data:image/svg+xml,${svg}");
-}`)
-      }
-
-      if (icon.dark) {
-        const svg = await getSVG(icon.dark)
-        const selector = prefixSelectors('html.dark', selectors)
-        output.push(`
-${selector} {
-  content: '';
-  --icon: url("data:image/svg+xml,${svg}");
-}`)
-      }
-
-      return output.join('')
+      return (
+        iconRule(prefixSelectors('', selectors), await getSVG(icon.light)) +
+        iconRule(prefixSelectors('html.dark', selectors), await getSVG(icon.dark))
+      )
     }),
   )
 
@@ -236,11 +222,19 @@ async function getSVG(icon: string) {
 
   if (HTTP_URL_RE.test(icon)) {
     try {
-      const raw = await fetch(icon)
-      const iconContent = await raw.text()
-      return encodeSvgForCss(iconContent)
-    } catch {
-      console.warn(`[vitepress-plugin-group-icons]: Failed to fetch icon: ${icon}`)
+      const res = await fetch(icon, { signal: AbortSignal.timeout(FETCH_TIMEOUT) })
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`)
+      }
+      const iconContent = await res.text()
+      if (!SVG_TAG_RE.test(iconContent)) {
+        throw new Error('response is not an SVG')
+      }
+      return encodeSvgForCss(iconContent.trimStart())
+    } catch (error) {
+      console.warn(
+        `[vitepress-plugin-group-icons]: Failed to fetch icon: ${icon} (${error instanceof Error ? error.message : String(error)})`,
+      )
       return ''
     }
   }

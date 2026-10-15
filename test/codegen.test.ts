@@ -1,8 +1,13 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { builtinIcons, localIconLoader } from '../src'
 import { generateCSS, getMatchedLabels } from '../src/codegen'
 
 describe('generate css', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
   it('builtin icon', async () => {
     const labels = new Set(['npm', 'yarn'])
     expect(
@@ -90,6 +95,36 @@ describe('generate css', () => {
         customIcon: {},
       }),
     ).toMatchSnapshot()
+  })
+
+  it('skips remote icons that fail to load', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const fetchMock = vi.fn(async (url: string, _init?: RequestInit) =>
+      url.endsWith('404.svg')
+        ? new Response('<html>Not Found</html>', { status: 404 })
+        : new Response('<html>Login</html>', { status: 200 }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { css } = await generateCSS(new Set(['missing', 'html']), {
+      customIcon: {
+        missing: 'https://example.com/404.svg',
+        html: 'https://example.com/login.svg',
+      },
+    })
+
+    expect(css).not.toContain(`[data-title='missing']`)
+    expect(css).not.toContain(`[data-title='html']`)
+    expect(fetchMock.mock.calls[0][1]).toEqual({ signal: expect.any(AbortSignal) })
+    expect(warn).toHaveBeenCalledTimes(2)
+  })
+
+  it('skips icons that do not exist', async () => {
+    const { css } = await generateCSS(new Set(['nope']), {
+      customIcon: { nope: 'logos:this-icon-does-not-exist' },
+    })
+
+    expect(css).not.toContain(`[data-title='nope']`)
   })
 
   it('raw svg with an XML declaration', async () => {
