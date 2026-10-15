@@ -1,5 +1,6 @@
 import type { Icon, IconValue, Options } from './types'
 import { createRequire } from 'node:module'
+import { join } from 'node:path'
 import { encodeSvgForCss, getIconData, iconToHTML, iconToSVG } from '@iconify/utils'
 import { builtinIcons } from './builtin'
 import { namedIconMatchRegex } from './utils'
@@ -7,6 +8,8 @@ import { namedIconMatchRegex } from './utils'
 const HTTP_URL_RE = /^https?:\/\//
 const SVG_TAG_RE = /<svg[\s>]/i
 const FETCH_TIMEOUT = 10_000
+
+const pluginRequire = createRequire(import.meta.url)
 const CSS_STRING_SPECIAL_CHARS_RE = /['\\\n\r\f]/g
 const REGEXP_SPECIAL_CHARS_RE = /[.*+?^${}()|[\]\\]/g
 const CAMEL_CASE_BOUNDARY_RE = /([a-z0-9])([A-Z])/g
@@ -34,7 +37,10 @@ function escapeCSSString(value: string) {
   )
 }
 
-export async function generateCSS(labels: Set<string>, options: Options) {
+/**
+ * @param root Project root used to resolve `@iconify-json/*` packages that the plugin itself does not depend on.
+ */
+export async function generateCSS(labels: Set<string>, options: Options, root?: string) {
   const baseCSS = `
 .vp-code-block-title [data-title]::before,
 .vp-code-group [data-title]::before {
@@ -90,7 +96,7 @@ export async function generateCSS(labels: Set<string>, options: Options) {
     options.customIcon,
   )
 
-  const css = baseCSS + (await generateIconCSS(matched))
+  const css = baseCSS + (await generateIconCSS(matched, root))
 
   return { css }
 }
@@ -191,18 +197,18 @@ ${selector} {
 }`
 }
 
-async function generateIconCSS(matched: MatchedIcon[]) {
+async function generateIconCSS(matched: MatchedIcon[], root?: string) {
   const iconCSS = await Promise.all(
     matched.map(async ({ icon, labels }) => {
       const selectors = labels.map(label => `[data-title='${escapeCSSString(label)}']::before`)
 
       if (typeof icon === 'string') {
-        return iconRule(selectors.join(','), await getSVG(icon))
+        return iconRule(selectors.join(','), await getSVG(icon, root))
       }
 
       return (
-        iconRule(prefixSelectors('', selectors), await getSVG(icon.light)) +
-        iconRule(prefixSelectors('html.dark', selectors), await getSVG(icon.dark))
+        iconRule(prefixSelectors('', selectors), await getSVG(icon.light, root)) +
+        iconRule(prefixSelectors('html.dark', selectors), await getSVG(icon.dark, root))
       )
     }),
   )
@@ -210,7 +216,21 @@ async function generateIconCSS(matched: MatchedIcon[]) {
   return iconCSS.sort().join('')
 }
 
-async function getSVG(icon: string) {
+// Prefer the plugin's own icon sets, then fall back to packages installed in the project,
+// which are not always reachable from the plugin's location (monorepos, strict pnpm).
+function requireIconSet(collection: string, root?: string) {
+  const id = `@iconify-json/${collection}`
+  try {
+    return pluginRequire(id)
+  } catch (error) {
+    if (!root) {
+      throw error
+    }
+    return createRequire(join(root, 'package.json'))(id)
+  }
+}
+
+async function getSVG(icon: string, root?: string) {
   if (!icon) {
     return ''
   }
@@ -241,7 +261,7 @@ async function getSVG(icon: string) {
 
   const [collection, iconName] = icon.split(':')
   try {
-    const { icons } = createRequire(import.meta.url)(`@iconify-json/${collection}`)
+    const { icons } = requireIconSet(collection, root)
     const iconData = getIconData(icons, iconName)
 
     if (iconData) {

@@ -36,6 +36,7 @@ export function groupIconVitePlugin(options?: Options): Plugin {
 
   let oldMatches = new Set<string>()
   let server: ViteDevServer | undefined
+  let root: string | undefined
 
   options = options || { customIcon: {} }
 
@@ -57,13 +58,17 @@ export function groupIconVitePlugin(options?: Options): Plugin {
       return undefined
     },
 
+    configResolved(config) {
+      root = config.root
+    },
+
     configureServer(_server) {
       server = _server
     },
 
     async load(id) {
       if (id === resolvedVirtualCssId) {
-        const { css } = await generateCSS(matches, options)
+        const { css } = await generateCSS(matches, options, root)
         oldMatches = new Set(matches)
         return css
       }

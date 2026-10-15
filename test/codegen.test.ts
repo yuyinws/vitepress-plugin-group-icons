@@ -1,3 +1,6 @@
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { builtinIcons, localIconLoader } from '../src'
 import { generateCSS, getMatchedLabels } from '../src/codegen'
@@ -125,6 +128,33 @@ describe('generate css', () => {
     })
 
     expect(css).not.toContain(`[data-title='nope']`)
+  })
+
+  it('resolves icon sets installed in the project root', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const root = await mkdtemp(join(tmpdir(), 'group-icons-'))
+    const iconSetDir = join(root, 'node_modules/@iconify-json/group-icons-fixture')
+    await mkdir(iconSetDir, { recursive: true })
+    await writeFile(
+      join(iconSetDir, 'package.json'),
+      '{"name":"@iconify-json/group-icons-fixture"}',
+    )
+    await writeFile(
+      join(iconSetDir, 'index.js'),
+      'module.exports = { icons: { prefix: "group-icons-fixture", width: 16, height: 16, icons: { dot: { body: "<circle r=\\"8\\"/>" } } } }',
+    )
+
+    const labels = new Set(['fixture'])
+    const options = { customIcon: { fixture: 'group-icons-fixture:dot' } }
+
+    try {
+      expect((await generateCSS(labels, options)).css).not.toContain(`[data-title='fixture']`)
+      expect((await generateCSS(labels, options, root)).css).toContain(
+        `[data-title='fixture']::before {`,
+      )
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
   })
 
   it('raw svg with an XML declaration', async () => {
