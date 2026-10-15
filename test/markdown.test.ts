@@ -62,6 +62,16 @@ describe('markdown', () => {
     expect(renderFence(md, 'ts [foo.ts]')).toContain('data-title="foo.ts"')
   })
 
+  it('escapes the title text', () => {
+    const md = createMd()
+
+    groupIconMdPlugin(md as any)
+
+    expect(renderFence(md, 'ts [Vec<T>.ts]')).toContain(
+      '<span class="vp-code-block-title-text" data-title="Vec&lt;T>.ts" v-pre>Vec&lt;T>.ts</span>',
+    )
+  })
+
   it('does not render a title bar for an empty title', () => {
     const md = createMd()
 

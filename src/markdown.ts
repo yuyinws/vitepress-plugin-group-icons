@@ -63,9 +63,11 @@ export function groupIconMdPlugin(md: Markdown, options?: MdPluginOptions) {
       // only render code block not in code-group
       if (!isOnCodeGroup && title?.trim() && (!(token as any).src || includeSnippet)) {
         const namedIconMatch = title.match(namedIconMatchRegex)
+        const titleText = namedIconMatch ? title.replace(namedIconMatch[0], '') : title
+        // v-pre keeps Vue from interpolating `{{ }}` in the title
         return `<div class="vp-code-block-title">
       <div class="vp-code-block-title-bar">
-          <span class="vp-code-block-title-text" data-title="${md.utils.escapeHtml(title)}">${namedIconMatch ? title.replace(namedIconMatch[0], '') : title}</span>
+          <span class="vp-code-block-title-text" data-title="${md.utils.escapeHtml(title)}" v-pre>${md.utils.escapeHtml(titleText)}</span>
       </div>
         ${fenceRule(...args)}
       </div>
