@@ -122,6 +122,21 @@ describe('generate css', () => {
     expect(warn).toHaveBeenCalledTimes(2)
   })
 
+  it('caches loaded icons between generations', async () => {
+    const fetchMock = vi.fn(
+      async () => new Response('<svg xmlns="http://www.w3.org/2000/svg"></svg>', { status: 200 }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+    const options = { customIcon: { cached: 'https://example.com/cached.svg' } }
+
+    const first = await generateCSS(new Set(['cached']), options)
+    const second = await generateCSS(new Set(['cached']), options)
+
+    expect(second).toEqual(first)
+    expect(first.css).toContain(`[data-title='cached']::before {`)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
   it('skips icons that do not exist', async () => {
     const { css } = await generateCSS(new Set(['nope']), {
       customIcon: { nope: 'logos:this-icon-does-not-exist' },

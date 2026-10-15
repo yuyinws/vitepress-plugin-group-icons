@@ -230,7 +230,26 @@ function requireIconSet(collection: string, root?: string) {
   }
 }
 
-async function getSVG(icon: string, root?: string) {
+const svgCache = new Map<string, Promise<string>>()
+
+// Cache icons across CSS regenerations so dev reloads do not refetch remote icons or
+// re-encode every icon. Failed loads are dropped so they are retried next time.
+function getSVG(icon: string, root?: string) {
+  const key = `${root ?? ''}\0${icon}`
+  let svg = svgCache.get(key)
+  if (!svg) {
+    svg = loadSVG(icon, root).then(result => {
+      if (!result) {
+        svgCache.delete(key)
+      }
+      return result
+    })
+    svgCache.set(key, svg)
+  }
+  return svg
+}
+
+async function loadSVG(icon: string, root?: string) {
   if (!icon) {
     return ''
   }
