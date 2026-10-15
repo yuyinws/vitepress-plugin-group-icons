@@ -23,21 +23,21 @@ export function groupIconMdPlugin(md: Markdown, options?: MdPluginOptions) {
   const codeGroupOpenRule = md.renderer.rules['container_code-group_open']
   if (codeGroupOpenRule) {
     md.renderer.rules['container_code-group_open'] = (...args) => {
-      return codeGroupOpenRule(...args).replace(
-        LABEL_RE,
-        (match: string, label: string) =>
-          `<label data-title="${md.utils.escapeHtml(label)}"${match.slice(6)}`,
+      return (
+        codeGroupOpenRule(...args)
+          // add data-title to labels that do not have one yet
+          .replace(
+            LABEL_RE,
+            (match: string, label: string) =>
+              `<label data-title="${md.utils.escapeHtml(label)}"${match.slice(6)}`,
+          )
+          // replace named icon in label content
+          .replace(NAMED_ICON_LABEL_RE, (_, labelStart, label, labelEnd) => {
+            const namedIconMatch = label.match(namedIconMatchRegex)
+            return `${labelStart}${namedIconMatch ? label.replace(namedIconMatch[0], '') : label}${labelEnd}`
+          })
       )
     }
-  }
-
-  // replace named icon in label content
-  md.renderer.rules['container_code-group_open']! = (...args) => {
-    const code = codeGroupOpenRule!(...args)
-    return code.replace(NAMED_ICON_LABEL_RE, (_, labelStart, label, labelEnd) => {
-      const namedIconMatch = label.match(namedIconMatchRegex)
-      return `${labelStart}${namedIconMatch ? label.replace(namedIconMatch[0], '') : label}${labelEnd}`
-    })
   }
 
   // code block rule
