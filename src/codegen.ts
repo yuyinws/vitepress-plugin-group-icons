@@ -5,6 +5,13 @@ import { builtinIcons } from './builtin'
 import { namedIconMatchRegex } from './utils'
 
 const HTTP_URL_RE = /^https?:\/\//
+const CSS_STRING_SPECIAL_CHARS_RE = /['\\\n\r\f]/g
+
+function escapeCSSString(value: string) {
+  return value.replace(CSS_STRING_SPECIAL_CHARS_RE, char =>
+    char === "'" || char === '\\' ? `\\${char}` : `\\${char.charCodeAt(0).toString(16)} `,
+  )
+}
 
 export async function generateCSS(labels: Set<string>, options: Options) {
   const baseCSS = `
@@ -129,7 +136,7 @@ function prefixSelectors(prefix: string, selectors: string[]) {
 async function generateIconCSS(matched: MatchedIcon[]) {
   const iconCSS = await Promise.all(
     matched.map(async ({ icon, labels }) => {
-      const selectors = labels.map(label => `[data-title='${label}']::before`)
+      const selectors = labels.map(label => `[data-title='${escapeCSSString(label)}']::before`)
 
       if (typeof icon === 'string') {
         if (!icon) {

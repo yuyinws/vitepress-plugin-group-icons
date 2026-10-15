@@ -11,6 +11,15 @@ const HTML_ENTITY_AMP_RE = /&(?:amp|#38);/g
 const DATA_TITLE_RE = /\bdata-title=\\"([^"]*)\\"|\bdata-title="([^"]*)"|"data-title":\s*"([^"]*)"/g
 const MARKDOWN_ID_RE = /\.(md|md\?vue|md\?v=)$/
 
+// Titles are captured from JS string literals in the compiled module, so `\\` and friends are still escaped.
+function decodeJsString(value: string) {
+  try {
+    return JSON.parse(`"${value}"`) as string
+  } catch {
+    return value
+  }
+}
+
 function decodeHtmlEntities(value: string) {
   return value
     .replaceAll(HTML_ENTITY_LT_RE, '<')
@@ -74,7 +83,7 @@ export function groupIconVitePlugin(options?: Options): Plugin {
 
           const title = match[1] ?? match[2] ?? match[3]
           if (title) {
-            matches.add(decodeHtmlEntities(title))
+            matches.add(decodeHtmlEntities(decodeJsString(title)))
           }
         }
 

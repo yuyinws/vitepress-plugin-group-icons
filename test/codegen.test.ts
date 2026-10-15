@@ -92,6 +92,15 @@ describe('generate css', () => {
     ).toMatchSnapshot()
   })
 
+  it('escapes labels in selectors', async () => {
+    const labels = new Set(["Dave's.ts", 'C:\\foo.ts', 'line\nbreak.ts'])
+    const { css } = await generateCSS(labels, {})
+
+    expect(css).toContain(
+      `[data-title='Dave\\'s.ts']::before,[data-title='C:\\\\foo.ts']::before,[data-title='line\\a break.ts']::before {`,
+    )
+  })
+
   it('correctly match', async () => {
     const labels = new Set([
       'test.c',
