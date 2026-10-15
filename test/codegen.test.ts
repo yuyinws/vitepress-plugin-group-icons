@@ -101,6 +101,48 @@ describe('generate css', () => {
     )
   })
 
+  it('matches keywords as whole words', () => {
+    const iconOf = (label: string) =>
+      getMatchedLabels(new Set([label]), builtinIcons).find(m => m.labels.includes(label))?.icon
+
+    // keyword inside another word falls back to the extension icon
+    expect(iconOf('member.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('invite.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('reactive.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('denormalize.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('markov.py')).toBe('vscode-icons:file-type-python')
+    expect(iconOf('triangular.py')).toBe('vscode-icons:file-type-python')
+    expect(iconOf('Envelope.php')).toBe('vscode-icons:file-type-php3')
+    expect(iconOf('bundle.js')).toEqual(builtinIcons['.js'])
+    expect(iconOf('consolidate.js')).toEqual(builtinIcons['.js'])
+    expect(iconOf('Ubuntu')).toBeUndefined()
+
+    // whole words, camelCase, digits and common suffixes still match
+    expect(iconOf('VitePress')).toEqual(builtinIcons.vite)
+    expect(iconOf('Vue3')).toBe(builtinIcons.vue)
+    expect(iconOf('Next.js')).toEqual(builtinIcons.next)
+    expect(iconOf('nextjs')).toEqual(builtinIcons.next)
+    expect(iconOf('.npmrc')).toBe(builtinIcons.npm)
+    expect(iconOf('.eslintignore')).toBe(builtinIcons.eslint)
+    expect(iconOf('.oxlintrc.json')).toEqual(builtinIcons.oxlint)
+    expect(iconOf('pnpm-workspace.yaml')).toEqual(builtinIcons.pnpm)
+    expect(iconOf('bunx')).toBe(builtinIcons.bun)
+    expect(iconOf('@tailwindcss/vite')).toBe(builtinIcons.tailwind)
+    expect(iconOf('UnoCSS')).toBe(builtinIcons.unocss)
+  })
+
+  it('matches custom keywords case-insensitively', () => {
+    const matched = getMatchedLabels(new Set(['docker-compose.yml', 'C++']), {
+      'Docker': 'vscode-icons:file-type-docker2',
+      'c++': 'vscode-icons:file-type-cpp',
+    })
+
+    expect(matched).toEqual([
+      { icon: 'vscode-icons:file-type-docker2', labels: ['docker-compose.yml'] },
+      { icon: 'vscode-icons:file-type-cpp', labels: ['C++'] },
+    ])
+  })
+
   it('correctly match', async () => {
     const labels = new Set([
       'test.c',

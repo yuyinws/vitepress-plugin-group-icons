@@ -6,6 +6,18 @@ import { namedIconMatchRegex } from './utils'
 
 const HTTP_URL_RE = /^https?:\/\//
 const CSS_STRING_SPECIAL_CHARS_RE = /['\\\n\r\f]/g
+const REGEXP_SPECIAL_CHARS_RE = /[.*+?^${}()|[\]\\]/g
+const CAMEL_CASE_BOUNDARY_RE = /([a-z0-9])([A-Z])/g
+
+function escapeRegExp(value: string) {
+  return value.replace(REGEXP_SPECIAL_CHARS_RE, '\\$&')
+}
+
+// A keyword matches a whole word, optionally followed by a `js`, `rc` or `ignore` suffix or digits:
+// `vite` matches `vite.config.ts`, `Vite 8` and `VitePress`, but not `invite.ts`.
+function createKeywordRE(keyword: string) {
+  return new RegExp(`(?<![a-z])${escapeRegExp(keyword)}(?:js|rc|ignore)?(?![a-z])`, 'i')
+}
 
 function escapeCSSString(value: string) {
   return value.replace(CSS_STRING_SPECIAL_CHARS_RE, char =>
@@ -89,7 +101,9 @@ function iconKey(icon: IconValue) {
 export function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[] {
   const matched = new Map<string, MatchedIcon>()
   const sortedEntries = Object.entries(icons).sort(([a], [b]) => b.length - a.length)
-  const keywordEntries = sortedEntries.filter(([label]) => !label.includes('.'))
+  const keywordEntries = sortedEntries
+    .filter(([label]) => !label.includes('.'))
+    .map(([keyword, icon]) => [createKeywordRE(keyword), icon] as const)
   const extensionEntries = sortedEntries.filter(([label]) => label.includes('.'))
 
   const add = (icon: IconValue, label: string) => {
@@ -109,7 +123,10 @@ export function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[
       add(namedIcon, label)
     } else {
       const lowerCaseLabel = label.toLowerCase()
-      const keywordMatch = keywordEntries.find(([keyword]) => lowerCaseLabel.includes(keyword))
+      const words = [label, label.replace(CAMEL_CASE_BOUNDARY_RE, '$1 $2')]
+      const keywordMatch = keywordEntries.find(([keywordRE]) =>
+        words.some(word => keywordRE.test(word)),
+      )
 
       if (keywordMatch) {
         add(keywordMatch[1], label)
