@@ -228,8 +228,10 @@ async function getSVG(icon: string) {
   if (!icon) {
     return ''
   }
-  if (icon.startsWith('<svg')) {
-    return encodeSvgForCss(icon)
+  // raw SVG may start with whitespace, a BOM, an XML declaration or a comment
+  const markup = icon.trimStart()
+  if (markup.startsWith('<')) {
+    return encodeSvgForCss(markup)
   }
 
   if (HTTP_URL_RE.test(icon)) {

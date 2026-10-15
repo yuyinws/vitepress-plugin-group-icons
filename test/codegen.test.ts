@@ -92,6 +92,17 @@ describe('generate css', () => {
     ).toMatchSnapshot()
   })
 
+  it('raw svg with an XML declaration', async () => {
+    const { css } = await generateCSS(new Set(['logo']), {
+      customIcon: {
+        logo: '﻿<?xml version="1.0" encoding="UTF-8"?>\n<!-- logo -->\n<svg xmlns="http://www.w3.org/2000/svg"></svg>\n',
+      },
+    })
+
+    expect(css).toContain(`[data-title='logo']::before {`)
+    expect(css).toContain('%3Csvg')
+  })
+
   it('escapes labels in selectors', async () => {
     const labels = new Set(["Dave's.ts", 'C:\\foo.ts', 'line\nbreak.ts'])
     const { css } = await generateCSS(labels, {})
