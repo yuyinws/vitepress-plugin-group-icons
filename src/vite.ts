@@ -72,7 +72,10 @@ export function groupIconVitePlugin(options?: Options): Plugin {
           const match = DATA_TITLE_RE.exec(code)
           if (!match) break
 
-          matches.add(decodeHtmlEntities(match[1] || match[2] || match[3]))
+          const title = match[1] ?? match[2] ?? match[3]
+          if (title) {
+            matches.add(decodeHtmlEntities(title))
+          }
         }
 
         if (!isSetEqual(matches, oldMatches)) {

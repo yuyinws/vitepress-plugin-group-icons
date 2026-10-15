@@ -58,16 +58,16 @@ export function groupIconMdPlugin(md: Markdown, options?: MdPluginOptions) {
           break
         }
       }
-      const title = token.info.match(TITLE_RE)
+      const title = token.info.match(TITLE_RE)?.[1]
 
       const isIncludedSnippet = _options.titleBar.includeSnippet
 
       // only render code block not in code-group
-      if (!isOnCodeGroup && title && (!(token as any).src || isIncludedSnippet)) {
-        const namedIconMatch = title[1].match(namedIconMatchRegex)
+      if (!isOnCodeGroup && title?.trim() && (!(token as any).src || isIncludedSnippet)) {
+        const namedIconMatch = title.match(namedIconMatchRegex)
         return `<div class="vp-code-block-title">
       <div class="vp-code-block-title-bar">
-          <span class="vp-code-block-title-text" data-title="${md.utils.escapeHtml(title[1])}">${namedIconMatch ? title[1].replace(namedIconMatch[0], '') : title[1]}</span>
+          <span class="vp-code-block-title-text" data-title="${md.utils.escapeHtml(title)}">${namedIconMatch ? title.replace(namedIconMatch[0], '') : title}</span>
       </div>
         ${fenceRule(...args)}
       </div>
