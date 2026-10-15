@@ -5,8 +5,8 @@ const LABEL_RE = /<label\b(?![^>]+\bdata-title\b)[^>]*>(.*?)<\/label>/g
 const NAMED_ICON_LABEL_RE = /(<label[^>]*>)(.*?)(<\/label>)/g
 const TITLE_RE = /\[((?:[^[\]]|\[[^[\]]*\])*)\]/
 
-interface MdPluginOptions {
-  titleBar: {
+export interface MdPluginOptions {
+  titleBar?: {
     /**
      * Whether the title bar is included in the [Snippets](https://vitepress.dev/guide/markdown#import-code-snippets)
      *
@@ -17,7 +17,7 @@ interface MdPluginOptions {
 }
 
 export function groupIconMdPlugin(md: Markdown, options?: MdPluginOptions) {
-  const _options = options || { titleBar: { includeSnippet: false } }
+  const includeSnippet = options?.titleBar?.includeSnippet ?? false
 
   // code group rule
   const codeGroupOpenRule = md.renderer.rules['container_code-group_open']
@@ -60,10 +60,8 @@ export function groupIconMdPlugin(md: Markdown, options?: MdPluginOptions) {
       }
       const title = token.info.match(TITLE_RE)?.[1]
 
-      const isIncludedSnippet = _options.titleBar.includeSnippet
-
       // only render code block not in code-group
-      if (!isOnCodeGroup && title?.trim() && (!(token as any).src || isIncludedSnippet)) {
+      if (!isOnCodeGroup && title?.trim() && (!(token as any).src || includeSnippet)) {
         const namedIconMatch = title.match(namedIconMatchRegex)
         return `<div class="vp-code-block-title">
       <div class="vp-code-block-title-bar">

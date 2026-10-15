@@ -54,6 +54,14 @@ describe('markdown', () => {
     expect(md.renderer.rules['container_code-group_open']).toBeUndefined()
   })
 
+  it('accepts options without titleBar', () => {
+    const md = createMd()
+
+    groupIconMdPlugin(md as any, {})
+
+    expect(renderFence(md, 'ts [foo.ts]')).toContain('data-title="foo.ts"')
+  })
+
   it('does not render a title bar for an empty title', () => {
     const md = createMd()
 
