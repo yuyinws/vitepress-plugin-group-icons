@@ -19,6 +19,13 @@ function createKeywordRE(keyword: string) {
   return new RegExp(`(?<![a-z])${escapeRegExp(keyword)}(?:js|rc|ignore)?(?![a-z])`, 'i')
 }
 
+// Fallback for an extension that is not at the end of the label: `.env` matches `.env.local`
+// and `.ts` matches `foo.ts (server)`, but `.c` does not match `test.c456789`.
+function createExtensionSegmentRE(extension: string) {
+  const start = /^[a-z0-9]/i.test(extension) ? '(?<![a-z0-9])' : ''
+  return new RegExp(`${start}${escapeRegExp(extension)}(?![a-z0-9])`, 'i')
+}
+
 function escapeCSSString(value: string) {
   return value.replace(CSS_STRING_SPECIAL_CHARS_RE, char =>
     char === "'" || char === '\\' ? `\\${char}` : `\\${char.charCodeAt(0).toString(16)} `,
@@ -104,7 +111,12 @@ export function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[
   const keywordEntries = sortedEntries
     .filter(([label]) => !label.includes('.'))
     .map(([keyword, icon]) => [createKeywordRE(keyword), icon] as const)
-  const extensionEntries = sortedEntries.filter(([label]) => label.includes('.'))
+  const extensionEntries = sortedEntries
+    .filter(([label]) => label.includes('.'))
+    .map(
+      ([extension, icon]) =>
+        [extension.toLowerCase(), createExtensionSegmentRE(extension), icon] as const,
+    )
 
   const add = (icon: IconValue, label: string) => {
     const key = iconKey(icon)
@@ -133,12 +145,12 @@ export function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[
         continue
       }
 
-      const extensionMatch = extensionEntries.find(([extension]) =>
-        lowerCaseLabel.endsWith(extension),
-      )
+      const extensionMatch =
+        extensionEntries.find(([extension]) => lowerCaseLabel.endsWith(extension)) ??
+        extensionEntries.find(([, segmentRE]) => segmentRE.test(label))
 
       if (extensionMatch) {
-        add(extensionMatch[1], label)
+        add(extensionMatch[2], label)
       }
     }
   }

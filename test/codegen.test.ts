@@ -131,6 +131,22 @@ describe('generate css', () => {
     expect(iconOf('UnoCSS')).toBe(builtinIcons.unocss)
   })
 
+  it('matches extensions that are not at the end of the label', () => {
+    const iconOf = (label: string) =>
+      getMatchedLabels(new Set([label]), builtinIcons).find(m => m.labels.includes(label))?.icon
+
+    expect(iconOf('.env')).toBe('vscode-icons:file-type-dotenv')
+    expect(iconOf('.env.local')).toBe('vscode-icons:file-type-dotenv')
+    expect(iconOf('.env.production.local')).toBe('vscode-icons:file-type-dotenv')
+    expect(iconOf('.env.example')).toBe('vscode-icons:file-type-dotenv')
+    expect(iconOf('foo.ts (server)')).toBe('vscode-icons:file-type-typescript')
+
+    // the extension at the end still wins
+    expect(iconOf('env.d.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('styles.module.scss.d.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('test.c456789')).toBeUndefined()
+  })
+
   it('matches custom keywords case-insensitively', () => {
     const matched = getMatchedLabels(new Set(['docker-compose.yml', 'C++']), {
       'Docker': 'vscode-icons:file-type-docker2',
