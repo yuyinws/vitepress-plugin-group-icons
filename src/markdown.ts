@@ -5,8 +5,8 @@ const LABEL_RE = /<label\b(?![^>]+\bdata-title\b)[^>]*>(.*?)<\/label>/g
 const NAMED_ICON_LABEL_RE = /(<label[^>]*>)(.*?)(<\/label>)/g
 const TITLE_RE = /\[((?:[^[\]]|\[[^[\]]*\])*)\]/
 
-interface MdPluginOptions {
-  titleBar: {
+export interface MdPluginOptions {
+  titleBar?: {
     /**
      * Whether the title bar is included in the [Snippets](https://vitepress.dev/guide/markdown#import-code-snippets)
      *
@@ -17,27 +17,27 @@ interface MdPluginOptions {
 }
 
 export function groupIconMdPlugin(md: Markdown, options?: MdPluginOptions) {
-  const _options = options || { titleBar: { includeSnippet: false } }
+  const includeSnippet = options?.titleBar?.includeSnippet ?? false
 
   // code group rule
   const codeGroupOpenRule = md.renderer.rules['container_code-group_open']
   if (codeGroupOpenRule) {
     md.renderer.rules['container_code-group_open'] = (...args) => {
-      return codeGroupOpenRule(...args).replace(
-        LABEL_RE,
-        (match: string, label: string) =>
-          `<label data-title="${md.utils.escapeHtml(label)}"${match.slice(6)}`,
+      return (
+        codeGroupOpenRule(...args)
+          // add data-title to labels that do not have one yet
+          .replace(
+            LABEL_RE,
+            (match: string, label: string) =>
+              `<label data-title="${md.utils.escapeHtml(label)}"${match.slice(6)}`,
+          )
+          // replace named icon in label content
+          .replace(NAMED_ICON_LABEL_RE, (_, labelStart, label, labelEnd) => {
+            const namedIconMatch = label.match(namedIconMatchRegex)
+            return `${labelStart}${namedIconMatch ? label.replace(namedIconMatch[0], '') : label}${labelEnd}`
+          })
       )
     }
-  }
-
-  // replace named icon in label content
-  md.renderer.rules['container_code-group_open']! = (...args) => {
-    const code = codeGroupOpenRule!(...args)
-    return code.replace(NAMED_ICON_LABEL_RE, (_, labelStart, label, labelEnd) => {
-      const namedIconMatch = label.match(namedIconMatchRegex)
-      return `${labelStart}${namedIconMatch ? label.replace(namedIconMatch[0], '') : label}${labelEnd}`
-    })
   }
 
   // code block rule
@@ -58,16 +58,16 @@ export function groupIconMdPlugin(md: Markdown, options?: MdPluginOptions) {
           break
         }
       }
-      const title = token.info.match(TITLE_RE)
-
-      const isIncludedSnippet = _options.titleBar.includeSnippet
+      const title = token.info.match(TITLE_RE)?.[1]
 
       // only render code block not in code-group
-      if (!isOnCodeGroup && title && (!(token as any).src || isIncludedSnippet)) {
-        const namedIconMatch = title[1].match(namedIconMatchRegex)
+      if (!isOnCodeGroup && title?.trim() && (!(token as any).src || includeSnippet)) {
+        const namedIconMatch = title.match(namedIconMatchRegex)
+        const titleText = namedIconMatch ? title.replace(namedIconMatch[0], '') : title
+        // v-pre keeps Vue from interpolating `{{ }}` in the title
         return `<div class="vp-code-block-title">
       <div class="vp-code-block-title-bar">
-          <span class="vp-code-block-title-text" data-title="${md.utils.escapeHtml(title[1])}">${namedIconMatch ? title[1].replace(namedIconMatch[0], '') : title[1]}</span>
+          <span class="vp-code-block-title-text" data-title="${md.utils.escapeHtml(title)}" v-pre>${md.utils.escapeHtml(titleText)}</span>
       </div>
         ${fenceRule(...args)}
       </div>

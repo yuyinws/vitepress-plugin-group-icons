@@ -1,8 +1,16 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { builtinIcons, localIconLoader } from '../src'
 import { generateCSS, getMatchedLabels } from '../src/codegen'
 
 describe('generate css', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
   it('builtin icon', async () => {
     const labels = new Set(['npm', 'yarn'])
     expect(
@@ -90,6 +98,177 @@ describe('generate css', () => {
         customIcon: {},
       }),
     ).toMatchSnapshot()
+  })
+
+  it('skips remote icons that fail to load', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const fetchMock = vi.fn(async (url: string, _init?: RequestInit) =>
+      url.endsWith('404.svg')
+        ? new Response('<html>Not Found</html>', { status: 404 })
+        : new Response('<html>Login</html>', { status: 200 }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { css } = await generateCSS(new Set(['missing', 'html']), {
+      customIcon: {
+        missing: 'https://example.com/404.svg',
+        html: 'https://example.com/login.svg',
+      },
+    })
+
+    expect(css).not.toContain(`[data-title='missing']`)
+    expect(css).not.toContain(`[data-title='html']`)
+    expect(fetchMock.mock.calls[0][1]).toEqual({ signal: expect.any(AbortSignal) })
+    expect(warn).toHaveBeenCalledTimes(2)
+  })
+
+  it('caches loaded icons between generations', async () => {
+    const fetchMock = vi.fn(
+      async () => new Response('<svg xmlns="http://www.w3.org/2000/svg"></svg>', { status: 200 }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+    const options = { customIcon: { cached: 'https://example.com/cached.svg' } }
+
+    const first = await generateCSS(new Set(['cached']), options)
+    const second = await generateCSS(new Set(['cached']), options)
+
+    expect(second).toEqual(first)
+    expect(first.css).toContain(`[data-title='cached']::before {`)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('skips icons that do not exist', async () => {
+    const { css } = await generateCSS(new Set(['nope']), {
+      customIcon: { nope: 'logos:this-icon-does-not-exist' },
+    })
+
+    expect(css).not.toContain(`[data-title='nope']`)
+  })
+
+  it('resolves icon sets installed in the project root', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const root = await mkdtemp(join(tmpdir(), 'group-icons-'))
+    const iconSetDir = join(root, 'node_modules/@iconify-json/group-icons-fixture')
+    await mkdir(iconSetDir, { recursive: true })
+    await writeFile(
+      join(iconSetDir, 'package.json'),
+      '{"name":"@iconify-json/group-icons-fixture"}',
+    )
+    await writeFile(
+      join(iconSetDir, 'index.js'),
+      'module.exports = { icons: { prefix: "group-icons-fixture", width: 16, height: 16, icons: { dot: { body: "<circle r=\\"8\\"/>" } } } }',
+    )
+
+    const labels = new Set(['fixture'])
+    const options = { customIcon: { fixture: 'group-icons-fixture:dot' } }
+
+    try {
+      expect((await generateCSS(labels, options)).css).not.toContain(`[data-title='fixture']`)
+      expect((await generateCSS(labels, options, root)).css).toContain(
+        `[data-title='fixture']::before {`,
+      )
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('raw svg with an XML declaration', async () => {
+    const { css } = await generateCSS(new Set(['logo']), {
+      customIcon: {
+        logo: '﻿<?xml version="1.0" encoding="UTF-8"?>\n<!-- logo -->\n<svg xmlns="http://www.w3.org/2000/svg"></svg>\n',
+      },
+    })
+
+    expect(css).toContain(`[data-title='logo']::before {`)
+    expect(css).toContain('%3Csvg')
+  })
+
+  it('escapes labels in selectors', async () => {
+    const labels = new Set(["Dave's.ts", 'C:\\foo.ts', 'line\nbreak.ts'])
+    const { css } = await generateCSS(labels, {})
+
+    expect(css).toContain(
+      `[data-title='Dave\\'s.ts']::before,[data-title='C:\\\\foo.ts']::before,[data-title='line\\a break.ts']::before {`,
+    )
+  })
+
+  it('matches keywords as whole words', () => {
+    const iconOf = (label: string) =>
+      getMatchedLabels(new Set([label]), builtinIcons).find(m => m.labels.includes(label))?.icon
+
+    // keyword inside another word falls back to the extension icon
+    expect(iconOf('member.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('invite.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('reactive.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('denormalize.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('markov.py')).toBe('vscode-icons:file-type-python')
+    expect(iconOf('triangular.py')).toBe('vscode-icons:file-type-python')
+    expect(iconOf('Envelope.php')).toBe('vscode-icons:file-type-php3')
+    expect(iconOf('bundle.js')).toEqual(builtinIcons['.js'])
+    expect(iconOf('consolidate.js')).toEqual(builtinIcons['.js'])
+    expect(iconOf('Ubuntu')).toBeUndefined()
+
+    // whole words, camelCase, digits and common suffixes still match
+    expect(iconOf('VitePress')).toEqual(builtinIcons.vite)
+    expect(iconOf('Vue3')).toBe(builtinIcons.vue)
+    expect(iconOf('Next.js')).toEqual(builtinIcons.next)
+    expect(iconOf('nextjs')).toEqual(builtinIcons.next)
+    expect(iconOf('.npmrc')).toBe(builtinIcons.npm)
+    expect(iconOf('.eslintignore')).toBe(builtinIcons.eslint)
+    expect(iconOf('.oxlintrc.json')).toEqual(builtinIcons.oxlint)
+    expect(iconOf('pnpm-workspace.yaml')).toEqual(builtinIcons.pnpm)
+    expect(iconOf('bunx')).toBe(builtinIcons.bun)
+    expect(iconOf('@tailwindcss/vite')).toBe(builtinIcons.tailwind)
+    expect(iconOf('UnoCSS')).toBe(builtinIcons.unocss)
+  })
+
+  it('matches extensions that are not at the end of the label', () => {
+    const iconOf = (label: string) =>
+      getMatchedLabels(new Set([label]), builtinIcons).find(m => m.labels.includes(label))?.icon
+
+    expect(iconOf('.env')).toBe('vscode-icons:file-type-dotenv')
+    expect(iconOf('.env.local')).toBe('vscode-icons:file-type-dotenv')
+    expect(iconOf('.env.production.local')).toBe('vscode-icons:file-type-dotenv')
+    expect(iconOf('.env.example')).toBe('vscode-icons:file-type-dotenv')
+    expect(iconOf('foo.ts (server)')).toBe('vscode-icons:file-type-typescript')
+
+    // the extension at the end still wins
+    expect(iconOf('env.d.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('styles.module.scss.d.ts')).toBe('vscode-icons:file-type-typescript')
+    expect(iconOf('test.c456789')).toBeUndefined()
+  })
+
+  it('prefers custom extensions over builtin ones', () => {
+    const labels = new Set([
+      '.vitepress/config.ts',
+      '.gitlab-ci.yml',
+      'docker-compose.yml (prod)',
+      'foo.ts',
+    ])
+    const matched = getMatchedLabels(labels, builtinIcons, {
+      '.vitepress': 'logos:vitejs',
+      '.gitlab-ci': 'vscode-icons:file-type-gitlab',
+      'docker-compose.yml': 'vscode-icons:file-type-docker2',
+    })
+
+    expect(matched).toEqual([
+      { icon: 'logos:vitejs', labels: ['.vitepress/config.ts'] },
+      { icon: 'vscode-icons:file-type-gitlab', labels: ['.gitlab-ci.yml'] },
+      { icon: 'vscode-icons:file-type-docker2', labels: ['docker-compose.yml (prod)'] },
+      { icon: 'vscode-icons:file-type-typescript', labels: ['foo.ts'] },
+    ])
+  })
+
+  it('matches custom keywords case-insensitively', () => {
+    const matched = getMatchedLabels(new Set(['docker-compose.yml', 'C++']), {
+      'Docker': 'vscode-icons:file-type-docker2',
+      'c++': 'vscode-icons:file-type-cpp',
+    })
+
+    expect(matched).toEqual([
+      { icon: 'vscode-icons:file-type-docker2', labels: ['docker-compose.yml'] },
+      { icon: 'vscode-icons:file-type-cpp', labels: ['C++'] },
+    ])
   })
 
   it('correctly match', async () => {

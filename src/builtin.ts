@@ -1,7 +1,9 @@
 import type { Icon } from './types'
 
 // Keyword match keys should not include a dot (`.`).
-// They are matched by `lowerCaseLabel.includes(keyword)` in `getMatchedLabels`.
+// They match a whole word of the label (case-insensitive, camelCase split), optionally
+// followed by a `js`, `rc` or `ignore` suffix or digits: `vite` matches `vite.config.ts`
+// and `VitePress`, `npm` matches `.npmrc`, but `ember` does not match `member.ts`.
 const keywordMatchIcons = {
   packageManager: {
     pnpm: {
@@ -11,6 +13,7 @@ const keywordMatchIcons = {
     npm: 'vscode-icons:file-type-npm',
     yarn: 'vscode-icons:file-type-yarn',
     bun: 'vscode-icons:file-type-bun',
+    bunx: 'vscode-icons:file-type-bun',
     deno: 'vscode-icons:file-type-deno',
   },
   frameworks: {
@@ -62,6 +65,7 @@ const keywordMatchIcons = {
     },
     eslint: 'vscode-icons:file-type-eslint',
     tailwind: 'vscode-icons:file-type-tailwind',
+    tailwindcss: 'vscode-icons:file-type-tailwind',
     unocss: 'vscode-icons:file-type-unocss',
   },
   misc: {

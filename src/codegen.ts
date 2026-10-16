@@ -1,12 +1,46 @@
 import type { Icon, IconValue, Options } from './types'
 import { createRequire } from 'node:module'
+import { join } from 'node:path'
 import { encodeSvgForCss, getIconData, iconToHTML, iconToSVG } from '@iconify/utils'
 import { builtinIcons } from './builtin'
 import { namedIconMatchRegex } from './utils'
 
 const HTTP_URL_RE = /^https?:\/\//
+const SVG_TAG_RE = /<svg[\s>]/i
+const FETCH_TIMEOUT = 10_000
 
-export async function generateCSS(labels: Set<string>, options: Options) {
+const pluginRequire = createRequire(import.meta.url)
+const CSS_STRING_SPECIAL_CHARS_RE = /['\\\n\r\f]/g
+const REGEXP_SPECIAL_CHARS_RE = /[.*+?^${}()|[\]\\]/g
+const CAMEL_CASE_BOUNDARY_RE = /([a-z0-9])([A-Z])/g
+
+function escapeRegExp(value: string) {
+  return value.replace(REGEXP_SPECIAL_CHARS_RE, '\\$&')
+}
+
+// A keyword matches a whole word, optionally followed by a `js`, `rc` or `ignore` suffix or digits:
+// `vite` matches `vite.config.ts`, `Vite 8` and `VitePress`, but not `invite.ts`.
+function createKeywordRE(keyword: string) {
+  return new RegExp(`(?<![a-z])${escapeRegExp(keyword)}(?:js|rc|ignore)?(?![a-z])`, 'i')
+}
+
+// Fallback for an extension that is not at the end of the label: `.env` matches `.env.local`
+// and `.ts` matches `foo.ts (server)`, but `.c` does not match `test.c456789`.
+function createExtensionSegmentRE(extension: string) {
+  const start = /^[a-z0-9]/i.test(extension) ? '(?<![a-z0-9])' : ''
+  return new RegExp(`${start}${escapeRegExp(extension)}(?![a-z0-9])`, 'i')
+}
+
+function escapeCSSString(value: string) {
+  return value.replace(CSS_STRING_SPECIAL_CHARS_RE, char =>
+    char === "'" || char === '\\' ? `\\${char}` : `\\${char.charCodeAt(0).toString(16)} `,
+  )
+}
+
+/**
+ * @param root Project root used to resolve `@iconify-json/*` packages that the plugin itself does not depend on.
+ */
+export async function generateCSS(labels: Set<string>, options: Options, root?: string) {
   const baseCSS = `
 .vp-code-block-title [data-title]::before,
 .vp-code-group [data-title]::before {
@@ -56,16 +90,13 @@ export async function generateCSS(labels: Set<string>, options: Options) {
 }
 `
 
-  const mergedIcons: Icon = {
-    ...builtinIcons,
-    ...options.customIcon,
-  }
   const matched = getMatchedLabels(
     new Set([...labels, ...(options.defaultLabels || [])]),
-    mergedIcons,
+    builtinIcons,
+    options.customIcon,
   )
 
-  const css = baseCSS + (await generateIconCSS(matched))
+  const css = baseCSS + (await generateIconCSS(matched, root))
 
   return { css }
 }
@@ -79,11 +110,31 @@ function iconKey(icon: IconValue) {
   return typeof icon === 'string' ? `s:${icon}` : `o:${JSON.stringify(icon)}`
 }
 
-export function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[] {
+function getSortedEntries(icons: Icon) {
+  return Object.entries(icons).sort(([a], [b]) => b.length - a.length)
+}
+
+function getExtensionEntries(icons: Icon) {
+  return getSortedEntries(icons)
+    .filter(([label]) => label.includes('.'))
+    .map(
+      ([extension, icon]) =>
+        [extension.toLowerCase(), createExtensionSegmentRE(extension), icon] as const,
+    )
+}
+
+export function getMatchedLabels(
+  labels: Set<string>,
+  icons: Icon,
+  customIcons: Icon = {},
+): MatchedIcon[] {
   const matched = new Map<string, MatchedIcon>()
-  const sortedEntries = Object.entries(icons).sort(([a], [b]) => b.length - a.length)
-  const keywordEntries = sortedEntries.filter(([label]) => !label.includes('.'))
-  const extensionEntries = sortedEntries.filter(([label]) => label.includes('.'))
+  const keywordEntries = getSortedEntries({ ...icons, ...customIcons })
+    .filter(([label]) => !label.includes('.'))
+    .map(([keyword, icon]) => [createKeywordRE(keyword), icon] as const)
+  // Custom extensions are tried before builtin ones, so a custom `.vitepress` matches
+  // `.vitepress/config.ts` before the builtin `.ts` does.
+  const extensionGroups = [getExtensionEntries(customIcons), getExtensionEntries(icons)]
 
   const add = (icon: IconValue, label: string) => {
     const key = iconKey(icon)
@@ -102,19 +153,26 @@ export function getMatchedLabels(labels: Set<string>, icons: Icon): MatchedIcon[
       add(namedIcon, label)
     } else {
       const lowerCaseLabel = label.toLowerCase()
-      const keywordMatch = keywordEntries.find(([keyword]) => lowerCaseLabel.includes(keyword))
+      const words = [label, label.replace(CAMEL_CASE_BOUNDARY_RE, '$1 $2')]
+      const keywordMatch = keywordEntries.find(([keywordRE]) =>
+        words.some(word => keywordRE.test(word)),
+      )
 
       if (keywordMatch) {
         add(keywordMatch[1], label)
         continue
       }
 
-      const extensionMatch = extensionEntries.find(([extension]) =>
-        lowerCaseLabel.endsWith(extension),
-      )
+      let extensionMatch
+      for (const extensionEntries of extensionGroups) {
+        extensionMatch =
+          extensionEntries.find(([extension]) => lowerCaseLabel.endsWith(extension)) ??
+          extensionEntries.find(([, segmentRE]) => segmentRE.test(label))
+        if (extensionMatch) break
+      }
 
       if (extensionMatch) {
-        add(extensionMatch[1], label)
+        add(extensionMatch[2], label)
       }
     }
   }
@@ -126,76 +184,103 @@ function prefixSelectors(prefix: string, selectors: string[]) {
   return selectors.map(s => `${prefix} ${s}`).join(',')
 }
 
-async function generateIconCSS(matched: MatchedIcon[]) {
-  const iconCSS = await Promise.all(
-    matched.map(async ({ icon, labels }) => {
-      const selectors = labels.map(label => `[data-title='${label}']::before`)
+function iconRule(selector: string, svg: string) {
+  // skip icons that failed to load instead of leaving an empty box before the label
+  if (!svg) {
+    return ''
+  }
 
-      if (typeof icon === 'string') {
-        if (!icon) {
-          return ''
-        }
-
-        const svg = await getSVG(icon)
-        const selector = selectors.join(',')
-        return `
+  return `
 ${selector} {
   content: '';
   --icon: url("data:image/svg+xml,${svg}");
 }`
+}
+
+async function generateIconCSS(matched: MatchedIcon[], root?: string) {
+  const iconCSS = await Promise.all(
+    matched.map(async ({ icon, labels }) => {
+      const selectors = labels.map(label => `[data-title='${escapeCSSString(label)}']::before`)
+
+      if (typeof icon === 'string') {
+        return iconRule(selectors.join(','), await getSVG(icon, root))
       }
 
-      const output: string[] = []
-
-      if (icon.light) {
-        const svg = await getSVG(icon.light)
-        const selector = prefixSelectors('', selectors)
-        output.push(`
-${selector} {
-  content: '';
-  --icon: url("data:image/svg+xml,${svg}");
-}`)
-      }
-
-      if (icon.dark) {
-        const svg = await getSVG(icon.dark)
-        const selector = prefixSelectors('html.dark', selectors)
-        output.push(`
-${selector} {
-  content: '';
-  --icon: url("data:image/svg+xml,${svg}");
-}`)
-      }
-
-      return output.join('')
+      return (
+        iconRule(prefixSelectors('', selectors), await getSVG(icon.light, root)) +
+        iconRule(prefixSelectors('html.dark', selectors), await getSVG(icon.dark, root))
+      )
     }),
   )
 
   return iconCSS.sort().join('')
 }
 
-async function getSVG(icon: string) {
+// Prefer the plugin's own icon sets, then fall back to packages installed in the project,
+// which are not always reachable from the plugin's location (monorepos, strict pnpm).
+function requireIconSet(collection: string, root?: string) {
+  const id = `@iconify-json/${collection}`
+  try {
+    return pluginRequire(id)
+  } catch (error) {
+    if (!root) {
+      throw error
+    }
+    return createRequire(join(root, 'package.json'))(id)
+  }
+}
+
+const svgCache = new Map<string, Promise<string>>()
+
+// Cache icons across CSS regenerations so dev reloads do not refetch remote icons or
+// re-encode every icon. Failed loads are dropped so they are retried next time.
+function getSVG(icon: string, root?: string) {
+  const key = `${root ?? ''}\0${icon}`
+  let svg = svgCache.get(key)
+  if (!svg) {
+    svg = loadSVG(icon, root).then(result => {
+      if (!result) {
+        svgCache.delete(key)
+      }
+      return result
+    })
+    svgCache.set(key, svg)
+  }
+  return svg
+}
+
+async function loadSVG(icon: string, root?: string) {
   if (!icon) {
     return ''
   }
-  if (icon.startsWith('<svg')) {
-    return encodeSvgForCss(icon)
+  // raw SVG may start with whitespace, a BOM, an XML declaration or a comment
+  const markup = icon.trimStart()
+  if (markup.startsWith('<')) {
+    return encodeSvgForCss(markup)
   }
 
   if (HTTP_URL_RE.test(icon)) {
     try {
-      const raw = await fetch(icon)
-      const iconContent = await raw.text()
-      return encodeSvgForCss(iconContent)
-    } catch {
-      console.warn(`[vitepress-plugin-group-icons]: Failed to fetch icon: ${icon}`)
+      const res = await fetch(icon, { signal: AbortSignal.timeout(FETCH_TIMEOUT) })
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`)
+      }
+      const iconContent = await res.text()
+      if (!SVG_TAG_RE.test(iconContent)) {
+        throw new Error('response is not an SVG')
+      }
+      return encodeSvgForCss(iconContent.trimStart())
+    } catch (error) {
+      console.warn(
+        `[vitepress-plugin-group-icons]: Failed to fetch icon: ${icon} (${error instanceof Error ? error.message : String(error)})`,
+      )
       return ''
     }
   }
 
   const [collection, iconName] = icon.split(':')
   try {
-    const { icons } = createRequire(import.meta.url)(`@iconify-json/${collection}`)
+    const { icons } = requireIconSet(collection, root)
     const iconData = getIconData(icons, iconName)
 
     if (iconData) {
