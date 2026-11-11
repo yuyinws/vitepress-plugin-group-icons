@@ -15,6 +15,10 @@ const keywordMatchIcons = {
     bun: 'vscode-icons:file-type-bun',
     bunx: 'vscode-icons:file-type-bun',
     deno: 'vscode-icons:file-type-deno',
+    vp: {
+      dark: 'vscode-icons:file-type-viteplus',
+      light: 'vscode-icons:file-type-light-viteplus',
+    },
   },
   frameworks: {
     vue: 'vscode-icons:file-type-vue',
