@@ -124,6 +124,9 @@ export default defineConfig({
 ``` [deno]
 ```
 
+``` [vp]
+```
+
 :::
 
 ### Frameworks

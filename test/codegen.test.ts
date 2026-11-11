@@ -137,6 +137,14 @@ describe('generate css', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
+  // fails when the `@iconify-json/vscode-icons` floor predates the Vite+ icon (1.2.93)
+  it('vp icon', async () => {
+    const { css } = await generateCSS(new Set(['vp']), {})
+
+    expect(css).toContain(`[data-title='vp']::before`)
+    expect(css).toContain(`html.dark [data-title='vp']::before`)
+  })
+
   it('skips icons that do not exist', async () => {
     const { css } = await generateCSS(new Set(['nope']), {
       customIcon: { nope: 'logos:this-icon-does-not-exist' },
