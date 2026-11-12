@@ -39,6 +39,9 @@ export function groupIconVitePlugin(options?: Options): Plugin {
   let updateTimer: ReturnType<typeof setTimeout> | undefined
   let server: ViteDevServer | undefined
   let root: string | undefined
+  let isBuild = false
+  // markdown entries of the current build; VitePress passes every page as an entry
+  let markdownEntries: string[] = []
 
   options = options || { customIcon: {} }
 
@@ -77,14 +80,40 @@ export function groupIconVitePlugin(options?: Options): Plugin {
 
     configResolved(config) {
       root = config.root
+      isBuild = config.command === 'build'
     },
 
     configureServer(_server) {
       server = _server
     },
 
+    buildStart(inputOptions) {
+      const { input } = inputOptions
+      const entries =
+        typeof input === 'string' ? [input] : Array.isArray(input) ? input : Object.values(input)
+      markdownEntries = entries.filter(entry => MARKDOWN_ID_RE.test(entry))
+    },
+
     async load(id) {
       if (id === resolvedVirtualCssId) {
+        // A build generates the CSS only once, so wait until every page has been transformed
+        // and its labels collected. Otherwise labels from pages that are transformed after
+        // this module is loaded would be missing. The dev server reloads the CSS instead.
+        if (isBuild) {
+          await Promise.all(
+            markdownEntries.map(async entry => {
+              try {
+                const resolved = await this.resolve(entry, undefined, { isEntry: true })
+                if (resolved && !resolved.external) {
+                  await this.load({ id: resolved.id })
+                }
+              } catch {
+                // a page that fails to load fails the build on its own
+              }
+            }),
+          )
+        }
+
         const count = matches.size
         const { css } = await generateCSS(matches, options, root)
         generatedCount = count
