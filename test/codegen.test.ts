@@ -142,15 +142,46 @@ describe('generate css', () => {
     const { css } = await generateCSS(new Set(['vp']), {})
 
     expect(css).toContain(`[data-title='vp']::before`)
-    expect(css).toContain(`html.dark [data-title='vp']::before`)
+    expect(css).toContain(
+      `html.dark :where(.vp-code-group,.vp-code-block-title) [data-title='vp']::before`,
+    )
   })
 
   it('skips icons that do not exist', async () => {
-    const { css } = await generateCSS(new Set(['nope']), {
-      customIcon: { nope: 'logos:this-icon-does-not-exist' },
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { css } = await generateCSS(new Set(['nope', 'path']), {
+      customIcon: { nope: 'logos:this-icon-does-not-exist', path: './logo.svg' },
     })
 
     expect(css).not.toContain(`[data-title='nope']`)
+    expect(css).not.toContain(`[data-title='path']`)
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('Icon `this-icon-does-not-exist` not found in icon set `logos`'),
+    )
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Invalid icon `./logo.svg`'))
+  })
+
+  it('waits before retrying an icon that failed to load', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const now = vi.spyOn(Date, 'now').mockReturnValue(1_000_000)
+    const fetchMock = vi.fn(async () => new Response('Not Found', { status: 404 }))
+    vi.stubGlobal('fetch', fetchMock)
+    const labels = new Set(['flaky'])
+    const options = { customIcon: { flaky: 'https://example.com/flaky.svg' } }
+
+    await generateCSS(labels, options)
+    await generateCSS(labels, options)
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(warn).toHaveBeenCalledTimes(1)
+
+    now.mockReturnValue(1_000_000 + 60_000)
+    fetchMock.mockImplementation(
+      async () => new Response('<svg xmlns="http://www.w3.org/2000/svg"></svg>', { status: 200 }),
+    )
+
+    expect((await generateCSS(labels, options)).css).toContain(`[data-title='flaky']::before {`)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
   it('resolves icon sets installed in the project root', async () => {
@@ -195,8 +226,9 @@ describe('generate css', () => {
     const labels = new Set(["Dave's.ts", 'C:\\foo.ts', 'line\nbreak.ts'])
     const { css } = await generateCSS(labels, {})
 
+    const scope = ':where(.vp-code-group,.vp-code-block-title)'
     expect(css).toContain(
-      `[data-title='Dave\\'s.ts']::before,[data-title='C:\\\\foo.ts']::before,[data-title='line\\a break.ts']::before {`,
+      `${scope} [data-title='Dave\\'s.ts']::before,${scope} [data-title='C:\\\\foo.ts']::before,${scope} [data-title='line\\a break.ts']::before {`,
     )
   })
 
@@ -264,6 +296,21 @@ describe('generate css', () => {
       { icon: 'vscode-icons:file-type-gitlab', labels: ['.gitlab-ci.yml'] },
       { icon: 'vscode-icons:file-type-docker2', labels: ['docker-compose.yml (prod)'] },
       { icon: 'vscode-icons:file-type-typescript', labels: ['foo.ts'] },
+    ])
+  })
+
+  it('prefers custom keywords over builtin ones', () => {
+    const matched = getMatchedLabels(
+      new Set(['docs/vite.config.ts', 'vite.config.ts']),
+      builtinIcons,
+      {
+        docs: 'vscode-icons:folder-type-docs',
+      },
+    )
+
+    expect(matched).toEqual([
+      { icon: 'vscode-icons:folder-type-docs', labels: ['docs/vite.config.ts'] },
+      { icon: builtinIcons.vite, labels: ['vite.config.ts'] },
     ])
   })
 
