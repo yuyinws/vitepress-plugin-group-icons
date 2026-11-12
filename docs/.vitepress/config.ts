@@ -53,7 +53,7 @@ export default defineConfig({
         content: 'Automatically fill the missing product icon for code groups.',
       },
     ],
-    ['meta', { property: 'og:image', content: `https://vpgi.vercel.app//og.png` }],
+    ['meta', { property: 'og:image', content: `https://vpgi.vercel.app/og.png` }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:url', content: 'https://vpgi.vercel.app/' }],
     ['meta', { property: 'twitter:card', content: 'summary_large_image' }],

@@ -1,3 +1,8 @@
+import type { Plugin } from 'vite'
+import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { build } from 'vite'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { groupIconVitePlugin } from '../src/vite'
 
@@ -77,5 +82,51 @@ describe('vite plugin', () => {
 
     expect(css).toContain(`[data-title='Dave\\'s.ts']::before`)
     expect(css).toContain(`[data-title='C:\\\\foo.ts']::before`)
+  })
+
+  it('waits for markdown entries before generating the icon CSS in a build', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'group-icons-build-'))
+    // stands in for a page whose markdown transform finishes after the CSS is requested
+    const slowMarkdown: Plugin = {
+      name: 'slow-markdown',
+      enforce: 'pre',
+      async transform(_code, id) {
+        if (!id.endsWith('.md')) {
+          return undefined
+        }
+        await new Promise(resolve => setTimeout(resolve, 50))
+        return { code: 'export default "<span data-title=\\"npm\\"></span>"', map: null }
+      },
+    }
+
+    try {
+      await writeFile(join(root, 'app.js'), `import 'virtual:group-icons.css'\n`)
+      await writeFile(join(root, 'page.md'), '# page\n')
+
+      const result = await build({
+        root,
+        configFile: false,
+        logLevel: 'silent',
+        plugins: [slowMarkdown, groupIconVitePlugin()],
+        build: {
+          write: false,
+          minify: false,
+          rolldownOptions: {
+            input: { app: join(root, 'app.js'), page: join(root, 'page.md') },
+          },
+        },
+      })
+
+      const outputs = Array.isArray(result) ? result : [result]
+      const css = outputs
+        .flatMap(output => ('output' in output ? output.output : []))
+        .filter(file => file.type === 'asset' && file.fileName.endsWith('.css'))
+        .map(file => (file.type === 'asset' ? String(file.source) : ''))
+        .join('')
+
+      expect(css).toMatch(/\[data-title=['"]npm['"]\]::before/)
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
   })
 })

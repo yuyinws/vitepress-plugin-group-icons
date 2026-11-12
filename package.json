@@ -21,14 +21,6 @@
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/*",
-        "./dist/index.d.ts"
-      ]
-    }
-  },
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
@@ -68,6 +60,9 @@
     "vite": {
       "optional": true
     }
+  },
+  "engines": {
+    "node": ">=18"
   },
   "packageManager": "pnpm@11.17.0"
 }

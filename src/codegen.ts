@@ -8,6 +8,10 @@ import { namedIconMatchRegex } from './utils'
 const HTTP_URL_RE = /^https?:\/\//
 const SVG_TAG_RE = /<svg[\s>]/i
 const FETCH_TIMEOUT = 10_000
+// how long a failed icon is skipped before it is loaded again
+const RETRY_DELAY = 30_000
+// Scope icon rules to the plugin's own markup; `:where()` keeps their specificity unchanged
+const ICON_SCOPE = ':where(.vp-code-group,.vp-code-block-title)'
 
 const pluginRequire = createRequire(import.meta.url)
 const CSS_STRING_SPECIAL_CHARS_RE = /['\\\n\r\f]/g
@@ -114,6 +118,12 @@ function getSortedEntries(icons: Icon) {
   return Object.entries(icons).sort(([a], [b]) => b.length - a.length)
 }
 
+function getKeywordEntries(icons: Icon) {
+  return getSortedEntries(icons)
+    .filter(([label]) => !label.includes('.'))
+    .map(([keyword, icon]) => [createKeywordRE(keyword), icon] as const)
+}
+
 function getExtensionEntries(icons: Icon) {
   return getSortedEntries(icons)
     .filter(([label]) => label.includes('.'))
@@ -129,11 +139,10 @@ export function getMatchedLabels(
   customIcons: Icon = {},
 ): MatchedIcon[] {
   const matched = new Map<string, MatchedIcon>()
-  const keywordEntries = getSortedEntries({ ...icons, ...customIcons })
-    .filter(([label]) => !label.includes('.'))
-    .map(([keyword, icon]) => [createKeywordRE(keyword), icon] as const)
-  // Custom extensions are tried before builtin ones, so a custom `.vitepress` matches
-  // `.vitepress/config.ts` before the builtin `.ts` does.
+  // Custom icons are tried before builtin ones, so a custom `docs` matches `docs/vite.config.ts`
+  // before the builtin `vite` does, and a custom `.vitepress` matches `.vitepress/config.ts`
+  // before the builtin `.ts` does.
+  const keywordEntries = [...getKeywordEntries(customIcons), ...getKeywordEntries(icons)]
   const extensionGroups = [getExtensionEntries(customIcons), getExtensionEntries(icons)]
 
   const add = (icon: IconValue, label: string) => {
@@ -200,14 +209,16 @@ ${selector} {
 async function generateIconCSS(matched: MatchedIcon[], root?: string) {
   const iconCSS = await Promise.all(
     matched.map(async ({ icon, labels }) => {
-      const selectors = labels.map(label => `[data-title='${escapeCSSString(label)}']::before`)
+      const selectors = labels.map(
+        label => `${ICON_SCOPE} [data-title='${escapeCSSString(label)}']::before`,
+      )
 
       if (typeof icon === 'string') {
         return iconRule(selectors.join(','), await getSVG(icon, root))
       }
 
       return (
-        iconRule(prefixSelectors('', selectors), await getSVG(icon.light, root)) +
+        iconRule(selectors.join(','), await getSVG(icon.light, root)) +
         iconRule(prefixSelectors('html.dark', selectors), await getSVG(icon.dark, root))
       )
     }),
@@ -231,22 +242,39 @@ function requireIconSet(collection: string, root?: string) {
 }
 
 const svgCache = new Map<string, Promise<string>>()
+const failedAt = new Map<string, number>()
 
 // Cache icons across CSS regenerations so dev reloads do not refetch remote icons or
-// re-encode every icon. Failed loads are dropped so they are retried next time.
+// re-encode every icon. Failed loads are retried, but only after `RETRY_DELAY`, so a burst
+// of regenerations does not wait for (and warn about) the same broken icon every time.
 function getSVG(icon: string, root?: string) {
   const key = `${root ?? ''}\0${icon}`
   let svg = svgCache.get(key)
   if (!svg) {
+    const failed = failedAt.get(key)
+    if (failed !== undefined && Date.now() - failed < RETRY_DELAY) {
+      return Promise.resolve('')
+    }
+
     svg = loadSVG(icon, root).then(result => {
-      if (!result) {
+      if (result) {
+        failedAt.delete(key)
+      } else {
         svgCache.delete(key)
+        // an empty icon is not a failure, there is nothing to retry
+        if (icon) {
+          failedAt.set(key, Date.now())
+        }
       }
       return result
     })
     svgCache.set(key, svg)
   }
   return svg
+}
+
+function warn(message: string) {
+  console.warn(`[vitepress-plugin-group-icons]: ${message}`)
 }
 
 async function loadSVG(icon: string, root?: string) {
@@ -271,30 +299,39 @@ async function loadSVG(icon: string, root?: string) {
       }
       return encodeSvgForCss(iconContent.trimStart())
     } catch (error) {
-      console.warn(
-        `[vitepress-plugin-group-icons]: Failed to fetch icon: ${icon} (${error instanceof Error ? error.message : String(error)})`,
+      warn(
+        `Failed to fetch icon: ${icon} (${error instanceof Error ? error.message : String(error)})`,
       )
       return ''
     }
   }
 
-  const [collection, iconName] = icon.split(':')
-  try {
-    const { icons } = requireIconSet(collection, root)
-    const iconData = getIconData(icons, iconName)
-
-    if (iconData) {
-      const { attributes, body } = iconToSVG(iconData)
-      const svg = iconToHTML(body, attributes)
-
-      return encodeSvgForCss(svg)
-    }
-
-    return ''
-  } catch {
-    console.warn(
-      `[vitepress-plugin-group-icons]: Icon set \`${collection}\` not found. Please install \`@iconify-json/${collection}\` first`,
+  const separator = icon.indexOf(':')
+  if (separator === -1) {
+    warn(
+      `Invalid icon \`${icon}\`. Expected an Iconify name (\`collection:icon\`), a URL or raw SVG`,
     )
     return ''
   }
+
+  const collection = icon.slice(0, separator)
+  const iconName = icon.slice(separator + 1)
+  let iconSet
+  try {
+    iconSet = requireIconSet(collection, root)
+  } catch {
+    warn(
+      `Icon set \`${collection}\` not found. Please install \`@iconify-json/${collection}\` first`,
+    )
+    return ''
+  }
+
+  const iconData = getIconData(iconSet.icons, iconName)
+  if (!iconData) {
+    warn(`Icon \`${iconName}\` not found in icon set \`${collection}\``)
+    return ''
+  }
+
+  const { attributes, body } = iconToSVG(iconData)
+  return encodeSvgForCss(iconToHTML(body, attributes))
 }
